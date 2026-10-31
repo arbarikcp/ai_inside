@@ -1,0 +1,18 @@
+[project]
+name = "ai-insider-workspace"
+version = "0.1.0"
+description = "Monorepo workspace for AI Engineering Insider projects"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "ai-harness-labs",
+    "llm-system-design",
+    "loop-engineering",
+]
+
+[tool.uv.sources]
+forge-harness-labs = { workspace = true }
+llm-system-design = { workspace = true }
+loop-engineering-lab = { workspace = true }
