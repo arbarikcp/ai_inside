@@ -19,6 +19,13 @@ def register_runner(name: str, factory: type) -> None:
     RUNNER_REGISTRY[name] = factory
 
 
+# --- Chapter registrations --------------------------------------------------
+from les.scratch.ch01 import AnatomyLoop, SingleShotChain  # noqa: E402
+
+register_runner("ch01_scratch_chain", SingleShotChain)
+register_runner("ch01_scratch_loop", AnatomyLoop)
+
+
 # The fixture is a placeholder until chapter implementations register.
 # Usage in contract tests:
 #   @pytest.mark.parametrize("runner_name", [...])
