@@ -1,0 +1,37 @@
+# Model configuration — loops ask for a role, not a model name.
+# Switch models by changing the alias mapping, never the loop code.
+# Run: LES_MODEL=claude pytest -m live  (to rerun any chapter on another model)
+
+default: mock
+
+roles:
+  maker: local
+  checker: claude       # Ch 8 maker/checker split uses a different model
+  cheap: local
+  strong: gpt
+
+models:
+  mock:
+    family: mock
+
+  local:
+    family: ollama
+    name: qwen3:14b
+    base_url: http://localhost:11434/v1
+
+  vllm:
+    family: vllm
+    name: <hf-model-id>       # replace with your model
+    base_url: http://localhost:8000/v1
+
+  gpt:
+    family: openai
+    name: gpt-4.1-mini        # replace with your model
+    price_in: 0.0
+    price_out: 0.0
+
+  claude:
+    family: anthropic
+    name: claude-sonnet-4-20250514
+    price_in: 0.0
+    price_out: 0.0

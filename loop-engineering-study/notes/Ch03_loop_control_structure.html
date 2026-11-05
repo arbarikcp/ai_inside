@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop Engineering Ch 3 Revision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Plan: engineer's revision sheet. Blueprint-cool paper, ink text, one cobalt accent reserved for feedback/back-edges,
+   red only for chain failure. Left rail = chapter map, right = dense numbered sections, diagrams over paragraphs. */
+:root{
+  --paper:#f4f6f8; --card:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#c4ccd5; --rule:#e2e7ec;
+  --accent:#2a58d0; --accent-soft:#e6edfb; --bad:#c23b2e; --good:#1f8a4c; --good-soft:#e3f3e9; --tint:#eef1f4;
+  --code-bg:#f0f3f6;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#11161c; --card:#171e26; --ink:#e4e9ee; --muted:#97a3b0; --line:#3a4653; --rule:#25303b;
+    --accent:#7aa0ff; --accent-soft:#1c2a4a; --bad:#ff7b6b; --good:#4fcf86; --good-soft:#163527; --tint:#1d252e;
+    --code-bg:#0f141a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11161c; --card:#171e26; --ink:#e4e9ee; --muted:#97a3b0; --line:#3a4653; --rule:#25303b;
+  --accent:#7aa0ff; --accent-soft:#1c2a4a; --bad:#ff7b6b; --good:#4fcf86; --good-soft:#163527; --tint:#1d252e;
+  --code-bg:#0f141a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15.5px/1.6 var(--f-body)}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 64px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;gap:16px}.rail{position:static!important}}
+
+/* rail */
+.rail{position:sticky;top:24px;align-self:start;display:flex;flex-direction:column;gap:16px}
+.book{font:600 11px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chap{font:700 34px/1 var(--f-display);color:var(--accent)}
+.rail nav{display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--rule)}
+.rail nav a{color:var(--muted);text-decoration:none;font-size:13.5px;padding:3px 0 3px 12px;margin-left:-2px;border-left:2px solid transparent}
+.rail nav a:hover,.rail nav a:focus-visible{color:var(--ink);border-left-color:var(--accent);outline:none}
+.rail nav a span{font-family:var(--f-mono);font-size:11.5px;margin-right:6px}
+@media (max-width:900px){.rail nav{flex-direction:row;flex-wrap:wrap;border-left:0;gap:4px 12px}.rail nav a{padding:0;border:0;margin:0}}
+
+main{display:flex;flex-direction:column;gap:28px;min-width:0}
+header h1{font:700 clamp(30px,4.4vw,44px)/1.05 var(--f-display);margin:0 0 10px;text-wrap:balance;letter-spacing:-.01em}
+header .lede{font-size:18px;color:var(--muted);margin:0;max-width:62ch}
+header .lede b{color:var(--ink);font-weight:600}
+
+section{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+section > h2{margin:0;font:700 21px/1.2 var(--f-display);display:flex;gap:10px;align-items:baseline;text-wrap:balance}
+section > h2 .n{font:600 13px var(--f-mono);color:var(--accent)}
+p{margin:0;max-width:72ch}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+
+.def{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.def .term{font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:2px}
+.callout{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:12px 16px;border-radius:8px;background:var(--tint)}
+.callout .tag{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.tag.insight{background:var(--accent);color:var(--card)}
+.tag.pitfall{background:var(--bad);color:var(--card)}
+.tag.field{background:var(--muted);color:var(--card)}
+.tag.rule{background:var(--good);color:var(--card)}
+
+.shift{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.shift div{border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.shift .to{border-color:var(--accent);background:var(--accent-soft)}
+.shift small{display:block;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.shift .arr{align-self:center;color:var(--accent);font:600 20px var(--f-mono)}
+@media (max-width:520px){.shift{grid-template-columns:1fr}.shift .arr{transform:rotate(90deg);justify-self:center}}
+
+.jobs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13.5px}
+.jobs span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--card)}
+.jobs i{color:var(--muted);font-style:normal}
+
+.fig{overflow-x:auto;margin:0 -4px}
+.fig svg{display:block;width:100%;min-width:620px;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--muted);margin-top:6px}
+figure{margin:0}
+/* svg tokens */
+.s-box{fill:none;stroke:var(--line);stroke-width:1.25}
+.s-acc{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.s-good{fill:var(--good-soft);stroke:var(--good);stroke-width:2}
+.s-tint{fill:var(--tint);stroke:var(--line);stroke-width:1.25}
+.s-edge{fill:none;stroke:var(--muted);stroke-width:1.25}
+.s-loop{fill:none;stroke:var(--accent);stroke-width:2}
+.s-dash{stroke:var(--muted);stroke-width:1.25;stroke-dasharray:4 4}
+.s-rule{stroke:var(--rule)}
+.m-edge{fill:var(--muted)} .m-loop{fill:var(--accent)}
+svg text{font-family:var(--f-body);fill:var(--ink);font-size:13px}
+svg .t-title{font-size:15px;font-weight:600}
+svg .t-q{fill:var(--muted);font-size:11.5px}
+svg .t-s{font-size:11px;fill:var(--muted)}
+svg .t-b{font-weight:600}
+svg .t-bad{fill:var(--bad);font-size:11.5px}
+svg .t-mono{font-family:var(--f-mono);font-size:12px}
+
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+th{font:600 11.5px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1.5px solid var(--line)}
+td:first-child{font-weight:600;white-space:nowrap}
+td.loop{background:var(--accent-soft)}
+
+pre{margin:0;background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;overflow-x:auto;font:13px/1.55 var(--f-mono)}
+pre .c{color:var(--muted)} pre .k{color:var(--accent);font-weight:500} pre .s{color:var(--good)}
+
+.badge{display:inline-block;font:600 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);vertical-align:middle}
+
+/* Q&A */
+.qa-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{font:500 13px var(--f-body);color:var(--accent);background:transparent;border:1px solid var(--accent);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+.btn:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+details{border:1px solid var(--line);border-radius:8px;background:var(--card)}
+details[open]{border-color:var(--accent)}
+summary{cursor:pointer;list-style:none;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:10px;font-weight:500}
+summary::-webkit-details-marker{display:none}
+summary .qn{font:600 12px var(--f-mono);color:var(--accent);padding-top:2px}
+summary .hint{display:block;font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
+details .ans{padding:0 14px 14px 14px;border-top:1px dashed var(--rule);padding-top:10px;font-size:14.5px}
+details .ans ul{padding-left:18px}
+
+.recap{counter-reset:r;list-style:none;padding:0;display:grid;gap:8px}
+.recap li{counter-increment:r;display:grid;grid-template-columns:28px 1fr;gap:8px}
+.recap li::before{content:counter(r);font:600 12px var(--f-mono);color:var(--card);background:var(--ink);border-radius:50%;width:22px;height:22px;display:grid;place-items:center;margin-top:2px}
+footer{font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+.s-card{fill:var(--card);stroke:var(--line);stroke-width:1.25}
+.s-bad{fill:none;stroke:var(--bad);stroke-width:2}
+.s-badfill{fill:var(--tint);stroke:var(--bad);stroke-width:1.5}
+.s-baddash{stroke:var(--bad);stroke-width:1.5;stroke-dasharray:5 4;fill:none}
+.s-later{fill:none;stroke:var(--line);stroke-width:1.25;stroke-dasharray:5 4}
+.s-bar{fill:var(--line)}
+.m-bad{fill:var(--bad)}
+svg .t-good{fill:var(--good);font-size:11.5px}
+.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.cards3 > div{border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.cards3 h3{margin:0;font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.cards3 p{font-size:14px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vs > div{border-radius:8px;padding:12px 14px;border:1px solid var(--line)}
+.vs .bad{border-color:var(--bad)}
+.vs .ok{border-color:var(--good)}
+.vs small{display:block;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.vs .bad small{color:var(--bad)} .vs .ok small{color:var(--good)}
+@media (max-width:560px){.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="rail">
+    <div>
+      <div class="book">Loop Engineering · Revision</div>
+      <div class="chap">Ch 03</div>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#s1"><span>01</span>60-second recap</a>
+      <a href="#s2"><span>02</span>Termination conditions</a>
+      <a href="#s3"><span>03</span>Stopping rules</a>
+      <a href="#s4"><span>04</span>Loop budgets</a>
+      <a href="#s5"><span>05</span>Early exit</a>
+      <a href="#s6"><span>06</span>Recursive vs iterative</a>
+      <a href="#s7"><span>07</span>Nested loops</a>
+      <a href="#s8"><span>08</span>Resumability</a>
+      <a href="#s9"><span>09</span>Policy in code</a>
+      <a href="#s10"><span>10</span>Production lens</a>
+      <a href="#s11"><span>11</span>Self-test Q&amp;A</a>
+      <a href="#s12"><span>12</span>Chapter summary</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header>
+      <h1>Loop Control Structures</h1>
+      <p class="lede">A loop that cannot stop is not autonomous. <b>It is expensive.</b> This chapter covers what decides whether the next iteration happens, and what happens when it does not.</p>
+    </header>
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2><span class="n">01</span>Chapter in 60 seconds</h2>
+      <div class="callout"><span class="tag pitfall">3 a.m.</span><p>The most expensive run is not the one that fails. It is the one on its 400th attempt at a test that cannot pass, burning money with nobody watching. It did everything you told it. You never told it when to quit.</p></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Control mechanism</th><th>Question it answers</th></tr></thead>
+        <tbody>
+          <tr><td>Termination conditions</td><td>What does "done", "failed" or "stuck" look like, observably?</td></tr>
+          <tr><td>Stopping rules (guards)</td><td>Should this specific next action be vetoed?</td></tr>
+          <tr><td>Budgets</td><td>Have we hit a hard resource ceiling, regardless of perceived progress?</td></tr>
+          <tr><td>Early exit</td><td>Is continuing provably pointless, before the ceiling?</td></tr>
+          <tr><td>Recursion / nesting</td><td>Which loop owns this sub-problem, and with which budget?</td></tr>
+          <tr><td>Resumability</td><td>After a crash, can we continue without redoing a side effect?</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2><span class="n">02</span>Termination conditions</h2>
+      <p>Every loop needs a concrete, <b>evaluable</b> definition of "done". Three categories:</p>
+      <figure class="fig">
+        <svg viewBox="0 0 760 290" role="img" aria-label="Every loop needs three exits, defined before any action logic">
+          <defs><marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker></defs>
+          <text x="24" y="28" class="t-title">Every loop needs three exits, defined before any action logic</text>
+          <path d="M240 160H320V80H400" class="s-edge" marker-end="url(#c1)"/>
+          <path d="M240 160H400" class="s-edge" marker-end="url(#c1)"/>
+          <path d="M240 160H320V240H400" class="s-edge" marker-end="url(#c1)"/>
+          <rect x="60" y="130" width="180" height="60" rx="8" class="s-box"/><text x="150" y="156" text-anchor="middle" class="t-b">Agent loop</text><text x="150" y="174" text-anchor="middle" class="t-s">every iteration checks</text>
+          <rect x="400" y="50" width="336" height="60" rx="8" class="s-good"/><text x="416" y="74" class="t-b">Success</text><text x="416" y="94" font-size="11.5">tests pass · matches spec · human approves</text>
+          <rect x="400" y="130" width="336" height="60" rx="8" class="s-badfill"/><text x="416" y="154" class="t-b">Failure</text><text x="416" y="174" font-size="11.5">max iterations · no progress · tool fails</text>
+          <rect x="400" y="210" width="336" height="60" rx="8" class="s-acc"/><text x="416" y="234" class="t-b">Escalation</text><text x="416" y="254" font-size="11.5">hand off to a human or a stronger agent</text>
+        </svg>
+      </figure>
+      <div class="vs">
+        <div class="bad"><small>Vague goal: infinite loop or meaningless output</small>"Improve the dashboard."</div>
+        <div class="ok"><small>Checkable goal: scope + behaviour + constraint</small>"Reduce initial dashboard load time by deferring non-critical charts while keeping existing filters working."</div>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2><span class="n">03</span>Stopping rules as first-class design requirements</h2>
+      <div class="callout"><span class="tag rule">Best practice</span><p>Write termination and failure conditions <b>before</b> any loop logic. "All tests pass and lint is clean" can be checked by code. "The code looks good" is a wish.</p></div>
+      <figure class="fig">
+        <svg viewBox="0 0 760 256" role="img" aria-label="Every guard vetoes before dispatch, not after">
+          <defs>
+            <marker id="c2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="c2b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-bad"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">Every guard vetoes before dispatch, not after</text>
+          <text x="24" y="48" class="t-q">Each guard returns a reason or nothing; any reason stops the call</text>
+          <path d="M124 110H138" class="s-edge" marker-end="url(#c2)"/><path d="M250 110H262" class="s-edge" marker-end="url(#c2)"/><path d="M374 110H386" class="s-edge" marker-end="url(#c2)"/><path d="M498 110H510" class="s-edge" marker-end="url(#c2)"/><path d="M622 110H636" class="s-edge" marker-end="url(#c2)"/>
+          <rect x="24" y="82" width="100" height="56" rx="8" class="s-box"/><text x="74" y="106" text-anchor="middle" font-size="12">Proposed</text><text x="74" y="122" text-anchor="middle" font-size="12">tool call</text>
+          <rect x="138" y="82" width="112" height="56" rx="8" class="s-box"/><text x="194" y="106" text-anchor="middle" font-size="12">Destructive</text><text x="194" y="122" text-anchor="middle" font-size="12">action?</text>
+          <rect x="262" y="82" width="112" height="56" rx="8" class="s-box"/><text x="318" y="106" text-anchor="middle" font-size="12">Outside task</text><text x="318" y="122" text-anchor="middle" font-size="12">scope?</text>
+          <rect x="386" y="82" width="112" height="56" rx="8" class="s-box"/><text x="442" y="106" text-anchor="middle" font-size="12">Blocker:</text><text x="442" y="122" text-anchor="middle" font-size="12">needs a human?</text>
+          <rect x="510" y="82" width="112" height="56" rx="8" class="s-box"/><text x="566" y="106" text-anchor="middle" font-size="12">Touches others'</text><text x="566" y="122" text-anchor="middle" font-size="12">changes?</text>
+          <rect x="636" y="82" width="100" height="56" rx="8" class="s-good"/><text x="686" y="106" text-anchor="middle" font-size="12" class="t-b">Dispatch</text><text x="686" y="122" text-anchor="middle" font-size="12">the tool</text>
+          <g class="s-bad"><path d="M194 138V180" marker-end="url(#c2b)"/><path d="M318 138V180" marker-end="url(#c2b)"/><path d="M442 138V180" marker-end="url(#c2b)"/><path d="M566 138V180" marker-end="url(#c2b)"/></g>
+          <text x="204" y="164" class="t-q">yes = veto</text>
+          <rect x="138" y="180" width="484" height="32" rx="8" class="s-badfill"/>
+          <text x="380" y="201" text-anchor="middle" class="t-mono">BLOCKED · reason recorded · nothing executed</text>
+          <text x="380" y="240" text-anchor="middle" class="t-bad">A guard that only logs, or fires after the command ran, is theatre</text>
+        </svg>
+      </figure>
+      <div class="tbl"><table>
+        <thead><tr><th>Guard</th><th>Stops when the next step would…</th></tr></thead>
+        <tbody>
+          <tr><td>Destructive-action</td><td>run an irreversible command (DB drop, force-push, credential rotation) without explicit human approval of that specific action</td></tr>
+          <tr><td>Scope-creep</td><td>touch files or systems outside the defined task boundary, even if the agent thinks it helps</td></tr>
+          <tr><td>Blocker escalation</td><td>need missing credentials, missing data, or a product judgement call the agent has no basis for</td></tr>
+          <tr><td>Unrelated-change</td><td>overwrite changes a human or another agent made concurrently</td></tr>
+        </tbody>
+      </table></div>
+      <p>Each one is a specific, codifiable veto on the next action, and each maps to a real incident class.</p>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2><span class="n">04</span>Loop budgets</h2>
+      <p>A budget is a <b>hard ceiling</b>, independent of whether the loop believes it is making progress.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Budget</th><th>Protects against</th><th>Signal on exhaustion → fix</th></tr></thead>
+        <tbody>
+          <tr><td>Iteration</td><td>Pathological retry loops</td><td>Strategy is wrong; escalate</td></tr>
+          <tr><td>Token</td><td>Context bloat, runaway cost</td><td>Compaction or summarisation needed (Ch 4)</td></tr>
+          <tr><td>Tool-call</td><td>Thrashing on a stuck sub-task</td><td>Action space or verifier is inadequate</td></tr>
+          <tr><td>Time (wall-clock)</td><td>Hanging tools, SLAs</td><td>A dependency is slow or down</td></tr>
+          <tr><td>Cost (USD)</td><td>Cross-model routing surprises</td><td>Route to a cheaper model, or stop</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><span class="tag insight">Key insight</span><p>An exhausted budget without progress is a <b>signal</b>, not just a limit: the current strategy is wrong. Escalate or switch strategy; don't quietly raise the ceiling and retry. Which budget you hit tells you which subsystem to fix.</p></div>
+      <figure class="fig">
+        <svg viewBox="0 0 760 236" role="img" aria-label="Set the ceiling just above p95 of successful runs">
+          <text x="24" y="28" class="t-title">Set the ceiling just above p95 of successful runs</text>
+          <text x="24" y="48" class="t-q">Schematic: iterations needed by successful runs on your offline eval set</text>
+          <rect x="420" y="60" width="260" height="128" style="fill:var(--tint)"/>
+          <g class="s-bar"><rect x="80" y="98" width="32" height="90"/><rect x="120" y="78" width="32" height="110"/><rect x="160" y="108" width="32" height="80"/><rect x="200" y="133" width="32" height="55"/><rect x="240" y="153" width="32" height="35"/><rect x="280" y="166" width="32" height="22"/><rect x="320" y="174" width="32" height="14"/><rect x="360" y="180" width="32" height="8"/></g>
+          <line x1="60" y1="188" x2="720" y2="188" class="s-edge"/>
+          <text x="720" y="206" text-anchor="end" class="t-q">iterations per run →</text>
+          <line x1="404" y1="64" x2="404" y2="188" class="s-dash"/>
+          <text x="396" y="76" text-anchor="end" class="t-q">p95 of successes</text>
+          <line x1="420" y1="60" x2="420" y2="188" stroke="var(--accent)" stroke-width="2"/>
+          <text x="428" y="78" font-size="11.5" class="t-b">good ceiling</text>
+          <line x1="680" y1="60" x2="680" y2="188" class="s-baddash"/>
+          <text x="672" y="78" text-anchor="end" class="t-bad">ceiling set too high</text>
+          <text x="550" y="130" text-anchor="middle" font-size="11.5">iterations a stuck loop wastes</text>
+          <text x="550" y="146" text-anchor="middle" font-size="11.5">before a high ceiling stops it</text>
+          <text x="24" y="228" font-size="11.5">Tune per task class. Add a no-progress detector so a stuck loop stops far earlier than any budget.</text>
+        </svg>
+      </figure>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th>Budget</th><th>No-progress detector</th></tr></thead>
+        <tbody>
+          <tr><td>Caps</td><td>Absolute consumption</td><td class="loop">Wasted (repeated) consumption</td></tr>
+          <tr><td>Fires on</td><td>A counter crossing its max</td><td class="loop">N consecutive iterations with no new information: same error, same failing tests, near-identical action</td></tr>
+          <tr><td>Goes to</td><td>FAILED / BLOCKED</td><td class="loop">BLOCKED (at <code>no_progress_limit</code>)</td></tr>
+          <tr><td>Progress means</td><td colspan="2">A change in the verifier's output or the set of failing tests, not the model merely saying something different</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2><span class="n">05</span>Early-exit and short-circuit logic</h2>
+      <div class="vs">
+        <div class="ok"><small>Exit early when (verified)</small><ul><li>The success condition is met well before the budget</li><li>An observation makes the rest of the plan provably unnecessary (the bug doesn't exist in this version)</li><li>A hard blocker is detected, with no value in workarounds</li></ul></div>
+        <div class="bad"><small>Never exit early on</small><ul><li>The model's self-assessment alone ("I think I'm done")</li><li>That reintroduces confidently wrong output, the failure verification exists to prevent</li></ul></div>
+      </div>
+      <p>Early exit and verification are complementary: exit on a checker passing or a deterministic precondition failing.</p>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2><span class="n">06</span>Recursive vs iterative structures</h2>
+      <figure class="fig">
+        <svg viewBox="0 0 760 276" role="img" aria-label="Recurse when a sub-task deserves its own context and budget">
+          <defs><marker id="c3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker></defs>
+          <text x="24" y="28" class="t-title">Recurse when a sub-task deserves its own context and budget</text>
+          <rect x="24" y="44" width="340" height="196" rx="8" class="s-tint"/>
+          <text x="40" y="68" class="t-b">Iterate in place</text>
+          <rect x="44" y="84" width="300" height="136" rx="8" class="s-card"/>
+          <text x="60" y="108" font-size="12">Parent context</text>
+          <text x="60" y="132" class="t-s">iteration 1: messages + tool output</text>
+          <text x="60" y="150" class="t-s">iteration 2: messages + tool output</text>
+          <text x="60" y="168" class="t-s">iteration 3: messages + tool output</text>
+          <text x="60" y="204" class="t-q">one context keeps growing, state shared</text>
+          <rect x="384" y="44" width="352" height="196" rx="8" class="s-tint"/>
+          <text x="400" y="68" class="t-b">Recurse (spawn a sub-agent)</text>
+          <rect x="404" y="82" width="312" height="36" rx="8" class="s-card"/><text x="560" y="105" text-anchor="middle" font-size="12.5">Parent agent</text>
+          <path d="M480 118V160" class="s-edge" marker-end="url(#c3)"/><text x="470" y="144" text-anchor="end" class="t-q">one question</text>
+          <path d="M640 160V118" class="s-edge" marker-end="url(#c3)"/><text x="650" y="144" class="t-q">result only</text>
+          <rect x="404" y="160" width="312" height="64" rx="8" class="s-acc"/><text x="420" y="182" class="t-b">Sub-agent</text><text x="420" y="200" font-size="11.5">fresh context window, own tool budget,</text><text x="420" y="216" font-size="11.5">own termination logic</text>
+          <text x="194" y="262" text-anchor="middle" class="t-q">Best: tightly coupled steps that share state</text>
+          <text x="560" y="262" text-anchor="middle" class="t-q">Best: a genuinely independent sub-task</text>
+        </svg>
+      </figure>
+      <p><b>Example:</b> while building a feature, the parent needs to know why one library function behaves oddly. A sub-agent investigates just that, keeping the parent's context clean. <b>Cost of recursion:</b> coordination and context passing. <b>Anti-pattern:</b> recursing for trivially coupled steps.</p>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2><span class="n">07</span>Nested loops</h2>
+      <figure class="fig">
+        <svg viewBox="0 0 760 300" role="img" aria-label="Loops nest, and each layer stops on its own signal">
+          <text x="24" y="28" class="t-title">Loops nest, and each layer stops on its own signal</text>
+          <rect x="24" y="44" width="712" height="240" rx="10" class="s-later"/>
+          <text x="40" y="66" font-size="12" class="t-s">Hill-climbing loop over a population of agent runs (Ch 12)</text>
+          <rect x="44" y="76" width="672" height="188" rx="10" class="s-later"/>
+          <text x="60" y="98" font-size="12" class="t-s">Verification loop wraps the core agent loop (Ch 8)</text>
+          <rect x="64" y="108" width="632" height="136" rx="10" class="s-box"/>
+          <text x="80" y="132" class="t-b">Outer planning loop: decides what to do next</text>
+          <text x="680" y="132" text-anchor="end" class="t-good">stops when: the overall goal is verified</text>
+          <rect x="84" y="152" width="592" height="72" rx="8" class="s-acc"/>
+          <text x="100" y="176" class="t-b">Inner tool-execution loop: decides how</text>
+          <text x="100" y="198" font-size="12">observe → act → observe</text>
+          <text x="660" y="176" text-anchor="end" class="t-good">stops when: this tool call succeeded</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag pitfall">Pitfall</span><p>One budget and one stopping rule for both layers. Result: the system gives up on the whole goal because one inner step failed, or inner thrashing never bubbles up to the outer budget.</p></div>
+      <p>Nesting is the load-bearing idea behind "loop stacking", developed fully in Chapter 12.</p>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2><span class="n">08</span>Loop re-entry and resumability</h2>
+      <div class="cards3">
+        <div><h3>1 · Serialise state</h3><p>What was tried, what succeeded, what is pending, written to durable storage at every iteration boundary, not only at the end.</p></div>
+        <div><h3>2 · Resumption protocol</h3><p>A clear procedure that rebuilds the loop's working memory from that serialised state.</p></div>
+        <div><h3>3 · Idempotent actions</h3><p>Side effects keyed by a deterministic request id, so a repeat is a no-op (Ch 6).</p></div>
+      </div>
+      <figure class="fig">
+        <svg viewBox="0 0 760 248" role="img" aria-label="Resumable loops checkpoint state and key every side effect">
+          <defs>
+            <marker id="c4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="c4b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-bad"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">Resumable loops checkpoint state and key every side effect</text>
+          <text x="24" y="48" class="t-q">Book's examples of the failure: a duplicate payment, a doubled file write, a re-sent notification</text>
+          <text x="24" y="88" class="t-b">No durable</text><text x="24" y="104" class="t-b">state</text>
+          <rect x="140" y="72" width="120" height="40" rx="8" class="s-box"/><text x="200" y="96" text-anchor="middle" font-size="12.5">Charge card</text>
+          <path d="M260 92H320" class="s-baddash" marker-end="url(#c4b)"/><text x="290" y="84" text-anchor="middle" class="t-bad">crash</text>
+          <rect x="320" y="72" width="140" height="40" rx="8" class="s-box"/><text x="390" y="96" text-anchor="middle" font-size="12.5">Restart from zero</text>
+          <path d="M460 92H490" class="s-edge" marker-end="url(#c4)"/>
+          <rect x="490" y="72" width="140" height="40" rx="8" class="s-bad"/><text x="560" y="96" text-anchor="middle" font-size="12.5">Charge card again</text>
+          <text x="640" y="96" class="t-bad">duplicate</text>
+          <line x1="24" y1="140" x2="736" y2="140" class="s-rule"/>
+          <text x="24" y="204" class="t-b">Resumable</text>
+          <rect x="140" y="176" width="112" height="48" rx="8" class="s-box"/><text x="196" y="196" text-anchor="middle" font-size="12">Checkpoint</text><text x="196" y="212" text-anchor="middle" font-size="12">state</text>
+          <path d="M252 200H270" class="s-edge" marker-end="url(#c4)"/>
+          <rect x="270" y="176" width="130" height="48" rx="8" class="s-box"/><text x="335" y="196" text-anchor="middle" font-size="12">Charge card,</text><text x="335" y="212" text-anchor="middle" font-size="12">key = request id</text>
+          <path d="M400 200H445" class="s-baddash" marker-end="url(#c4b)"/><text x="422" y="190" text-anchor="middle" class="t-bad">crash</text>
+          <rect x="445" y="176" width="130" height="48" rx="8" class="s-acc"/><text x="510" y="196" text-anchor="middle" font-size="12">Resume from</text><text x="510" y="212" text-anchor="middle" font-size="12">checkpoint</text>
+          <path d="M575 200H595" class="s-edge" marker-end="url(#c4)"/>
+          <rect x="595" y="176" width="141" height="48" rx="8" class="s-good"/><text x="665" y="196" text-anchor="middle" font-size="12">Same key: no-op,</text><text x="665" y="212" text-anchor="middle" font-size="12">continue</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag field">From the field</span><p>The most common production failure in long-running loops is not a bad model decision. It is a crash mid-iteration with no durable record, then a restart that redoes a half-finished action. <b>For any loop longer than a few minutes, resumability is a prerequisite.</b></p></div>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <h2><span class="n">09</span>Policy in code: <code>TerminationPolicy</code></h2>
+      <p>Control logic is a separate, testable object, not ifs buried in the loop body. You can unit-test "does the budget stop at five tool calls?" without a model.</p>
+      <figure class="fig">
+        <svg viewBox="0 0 760 300" role="img" aria-label="Policy is separate from mechanism, so one loop serves many domains">
+          <defs><marker id="c5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker></defs>
+          <text x="24" y="28" class="t-title">Policy is separate from mechanism, so one loop serves many domains</text>
+          <rect x="24" y="96" width="220" height="80" rx="8" class="s-box"/>
+          <text x="40" y="120" class="t-b">AgentLoop: mechanism</text>
+          <text x="40" y="140" font-size="11.5">about 120 lines, any domain</text>
+          <text x="40" y="158" font-size="11.5">consults the policy each step</text>
+          <path d="M244 136H300" class="s-edge" marker-start="url(#c5)" marker-end="url(#c5)"/>
+          <rect x="300" y="48" width="436" height="188" rx="10" class="s-tint"/>
+          <text x="316" y="72" class="t-b">TerminationPolicy</text>
+          <rect x="316" y="84" width="200" height="64" rx="8" class="s-card"/><text x="330" y="106" class="t-b" font-size="12.5">Budget</text><text x="330" y="124" class="t-s">iterations, tokens,</text><text x="330" y="140" class="t-s">tool calls, seconds</text>
+          <rect x="528" y="84" width="192" height="64" rx="8" class="s-card"/><text x="542" y="106" class="t-b" font-size="12.5">Stopping rules</text><text x="542" y="124" class="t-s">veto_action() runs before</text><text x="542" y="140" class="t-s">every tool dispatch</text>
+          <rect x="316" y="160" width="200" height="64" rx="8" class="s-card"/><text x="330" y="182" class="t-b" font-size="12.5">No-progress detector</text><text x="330" y="200" class="t-s">counts repeats with no</text><text x="330" y="216" class="t-s">new info → BLOCKED</text>
+          <rect x="528" y="160" width="192" height="64" rx="8" class="s-acc"/><text x="542" y="182" class="t-b" font-size="12.5">Success predicate</text><text x="542" y="200" class="t-s">injected per task,</text><text x="542" y="216" class="t-s">not hard-coded</text>
+          <g class="s-edge"><path d="M624 224V250"/><path d="M365 250H678"/><path d="M365 250V258"/><path d="M523 250V258"/><path d="M678 250V258"/></g>
+          <rect x="300" y="258" width="130" height="28" rx="14" class="s-box"/><text x="365" y="277" text-anchor="middle" font-size="11.5">coding: tests pass</text>
+          <rect x="440" y="258" width="166" height="28" rx="14" class="s-box"/><text x="523" y="277" text-anchor="middle" font-size="11.5">research: 3 sources agree</text>
+          <rect x="616" y="258" width="124" height="28" rx="14" class="s-box"/><text x="678" y="277" text-anchor="middle" font-size="11.5">data: schema valid</text>
+        </svg>
+      </figure>
+<pre><span class="k">@dataclass</span>
+<span class="k">class</span> Budget:                       <span class="c"># hard ceiling, independent of perceived progress</span>
+    max_iterations: int = 12
+    max_tokens: int = 100_000
+    max_tool_calls: int = 40
+    max_seconds: float = 300.0
+
+    <span class="k">def</span> exceeded(self, state) -&gt; str | None:
+        <span class="k">if</span> state.iteration &gt;= self.max_iterations: <span class="k">return</span> <span class="s">"iteration budget exhausted"</span>
+        <span class="k">if</span> state.tokens_used &gt;= self.max_tokens:   <span class="k">return</span> <span class="s">"token budget exhausted"</span>
+        ...                                       <span class="c"># tool calls, seconds</span>
+        <span class="k">return</span> None
+
+<span class="k">def</span> destructive_action_guard(dangerous=None):
+    dangerous = dangerous <span class="k">or</span> {<span class="s">"drop_table"</span>, <span class="s">"force_push"</span>, <span class="s">"rotate_credentials"</span>}
+    <span class="k">def</span> rule(state, tool_name, args):
+        approved = state.scratchpad.get(<span class="s">"human_approved"</span>, set())   <span class="c"># only a human step writes this</span>
+        <span class="k">if</span> tool_name <span class="k">in</span> dangerous <span class="k">and</span> tool_name <span class="k">not in</span> approved:
+            <span class="k">return</span> f<span class="s">"destructive action '{tool_name}' requires human approval"</span>
+        <span class="k">return</span> None
+    <span class="k">return</span> rule</pre>
+      <p class="badge" style="align-self:flex-start">Condensed from loop_engineering_lab/core/control.py</p>
+      <div class="cards3">
+        <div><h3>Un-bypassable guard · 1</h3><p>Consulted on the action path for <b>every</b> tool call, before dispatch.</p></div>
+        <div><h3>Un-bypassable guard · 2</h3><p><b>Fails closed:</b> no approval means block.</p></div>
+        <div><h3>Un-bypassable guard · 3</h3><p><b>Per-action, out-of-band</b> approval: approving one <code>drop_table</code> doesn't approve the next, and the model can't approve itself by writing "I have approval".</p></div>
+      </div>
+      <div class="callout"><span class="tag pitfall">Pitfall</span><p>A stopping rule that only logs a violation is theatre. <code>policy.veto_action</code> returns a reason before the tool runs, and any reason moves the loop straight to BLOCKED. A guard that fires after the irreversible command has run is not a guard.</p></div>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <h2><span class="n">10</span>Production lens: the same ideas in LangGraph <span class="badge">not from the book</span></h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Book concept</th><th>LangGraph equivalent</th></tr></thead>
+        <tbody>
+          <tr><td>Iteration ceiling</td><td><code>recursion_limit</code> in the run config (raises <code>GraphRecursionError</code>): the hard backstop</td></tr>
+          <tr><td>Token, tool-call, cost budgets; no-progress</td><td>Counters in graph state, checked by your router before the LLM node; route to a <code>blocked</code> node, not just an exception</td></tr>
+          <tr><td>Time budget</td><td>Timeouts on each tool plus a timeout around the whole run</td></tr>
+          <tr><td>Destructive-action guard</td><td>A guard node before the tool node that calls <code>interrupt()</code> for human approval; resume with <code>Command(resume=...)</code></td></tr>
+          <tr><td>Scope / unrelated-change guards</td><td>Deterministic argument checks (path allowlists, diff checks) in that same pre-tool node</td></tr>
+          <tr><td>Injected success predicate</td><td>A graph factory that takes the verifier function as a parameter</td></tr>
+          <tr><td>Recursion / nested loops</td><td>Subgraphs as nodes; <code>Send</code> to fan out sub-agents with their own state</td></tr>
+          <tr><td>Resumability</td><td>A durable checkpointer (e.g. Postgres) plus the same <code>thread_id</code> on resume. Side effects still need idempotency keys; in the functional API, wrap them in <code>@task</code> so completed results aren't re-run</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <div class="qa-head">
+        <h2 style="margin:0;font:700 21px/1.2 var(--f-display);display:flex;gap:10px;align-items:baseline"><span class="n" style="font:600 13px var(--f-mono);color:var(--accent)">11</span>Self-test: exercises 3.1–3.10</h2>
+        <button class="btn" id="toggle-all" type="button" aria-pressed="false">Reveal all answers</button>
+      </div>
+      <p>Answer aloud first, then open the card.</p>
+      <div class="qa">
+        <details><summary><span class="qn">3.1</span><span>Why design termination conditions before action logic?<span class="hint">"Done" must be observable.</span></span></summary>
+          <div class="ans">Without an evaluable "done", a loop runs forever or stops on a meaningless heuristic. Asking "what observable signal means success?" first often reshapes the whole design. Stopping rules added last give a system that can act but cannot reliably stop: runaway cost and confidently wrong output.</div></details>
+        <details><summary><span class="qn">3.2</span><span>Stopping-rule categories beyond success/failure?<span class="hint">Four guards.</span></span></summary>
+          <div class="ans">Destructive-action, scope-creep, blocker-escalation and unrelated-change guards. Each is a codifiable veto on the next action and maps to a real incident class.</div></details>
+        <details><summary><span class="qn">3.3</span><span>Tool-call budget exhausted without converging. Just a stop?<span class="hint">It's evidence.</span></span></summary>
+          <div class="ans">No: it's a signal the strategy is wrong (inadequate action space, unusable verifier, or mis-scoped task). Escalate or switch strategy; don't raise the ceiling. Token budget → context bloat; time → slow/hung dependency; tool-call → thrashing.</div></details>
+        <details><summary><span class="qn">3.4</span><span>How do you set budget values for a coding agent?<span class="hint">Use the eval distribution.</span></span></summary>
+          <div class="ans"><ul><li>Run on a representative task set; look at iteration and token histograms of <b>successful</b> runs.</li><li>Set the ceiling just above p95, below where a stuck loop wastes real money.</li><li>If successes take 2 and the ceiling is 20, add a no-progress detector.</li><li>Defence in depth (token, cost); tune per task class.</li></ul></div></details>
+        <details><summary><span class="qn">3.5</span><span>No-progress detector vs budget?<span class="hint">Wasted vs absolute.</span></span></summary>
+          <div class="ans">A budget caps absolute consumption; the detector caps wasted effort by counting consecutive iterations with no new information, then forcing BLOCKED. It fires earlier, on the pathology that matters most. Progress = the verifier's output or failing-test set changing.</div></details>
+        <details><summary><span class="qn">3.6</span><span>When to recurse (spawn a sub-agent) vs iterate in place?<span class="hint">Independence and fresh context.</span></span></summary>
+          <div class="ans">Recurse for a genuinely independent sub-task that benefits from a fresh context, its own budget and its own termination. Iterate when steps are tightly coupled and share state that is expensive to pass down. Anti-pattern: recursing for trivially coupled steps.</div></details>
+        <details><summary><span class="qn">3.7</span><span>Nested-loop structure of a production agent, and why it recurs?<span class="hint">Different timescales.</span></span></summary>
+          <div class="ans">An outer planning loop (what) wraps an inner tool-execution loop (how). Each layer has its own timescale and termination signal: "this tool call succeeded" vs "the overall goal is verified". One shared budget makes the system stop too eagerly or never.</div></details>
+        <details><summary><span class="qn">3.8</span><span>Crash mid-iteration; restart repeats a side effect. Fix?<span class="hint">State + idempotency.</span></span></summary>
+          <div class="ans"><ul><li>Serialise state at every iteration boundary.</li><li>Make side effects idempotent: key by a deterministic request id.</li><li>Define a resumption protocol that rebuilds working memory from saved state.</li></ul></div></details>
+        <details><summary><span class="qn">3.9</span><span>Make a destructive-action guard impossible to bypass?<span class="hint">Before dispatch, fail-closed.</span></span></summary>
+          <div class="ans">Check it on every tool call before dispatch; fail closed; require specific, per-action approval recorded out of band in <code>scratchpad["human_approved"]</code>, which only a human step can write. Never a guard that logs and proceeds, or one the model satisfies by saying "I have approval".</div></details>
+        <details><summary><span class="qn">3.10</span><span>What does early exit add, and when is it wrong?<span class="hint">Verified signals only.</span></span></summary>
+          <div class="ans">It saves cost and latency when continuing is provably pointless. It's dangerous when the "proof" is the model's own unverified claim. Exit on a checker passing or a deterministic precondition failing, never on self-assessment alone.</div></details>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <h2><span class="n">12</span>Chapter summary</h2>
+      <ol class="recap">
+        <li>Define success conditions, failure conditions and escalation paths before writing the loop's action logic.</li>
+        <li>Design four stopping-rule guards deliberately: destructive-action, scope-creep, blocker escalation, unrelated-change.</li>
+        <li>Budgets (token, time, tool-call, cost) are hard ceilings; exhausting one without progress means change strategy.</li>
+        <li>Loops nest: an outer planning loop contains an inner tool-execution loop, at every scale.</li>
+        <li>Long-running loops need durable, resumable state so a crash forces neither a restart from zero nor a repeated side effect.</li>
+      </ol>
+      <p><b>Next:</b> Part II turns inside each iteration, starting with how state is carried forward (Chapter 4).</p>
+    </section>
+
+    <footer>Revision notes for <i>Loop Engineering: The Operating Model Behind Modern Agentic AI Systems</i>, Chapter 3.</footer>
+  </main>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('toggle-all');
+  var cards=document.querySelectorAll('#s11 details');
+  function allOpen(){return Array.prototype.every.call(cards,function(d){return d.open});}
+  function sync(){var a=allOpen();btn.textContent=a?'Hide all answers':'Reveal all answers';btn.setAttribute('aria-pressed',String(a));}
+  btn.addEventListener('click',function(){var a=allOpen();cards.forEach(function(d){d.open=!a});sync();});
+  cards.forEach(function(d){d.addEventListener('toggle',sync)});
+})();
+</script>
+</body>
+</html>

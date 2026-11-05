@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop Engineering Ch 2 Revision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Plan: engineer's revision sheet. Blueprint-cool paper, ink text, one cobalt accent reserved for feedback/back-edges,
+   red only for chain failure. Left rail = chapter map, right = dense numbered sections, diagrams over paragraphs. */
+:root{
+  --paper:#f4f6f8; --card:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#c4ccd5; --rule:#e2e7ec;
+  --accent:#2a58d0; --accent-soft:#e6edfb; --bad:#c23b2e; --good:#1f8a4c; --good-soft:#e3f3e9; --tint:#eef1f4;
+  --code-bg:#f0f3f6;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#11161c; --card:#171e26; --ink:#e4e9ee; --muted:#97a3b0; --line:#3a4653; --rule:#25303b;
+    --accent:#7aa0ff; --accent-soft:#1c2a4a; --bad:#ff7b6b; --good:#4fcf86; --good-soft:#163527; --tint:#1d252e;
+    --code-bg:#0f141a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11161c; --card:#171e26; --ink:#e4e9ee; --muted:#97a3b0; --line:#3a4653; --rule:#25303b;
+  --accent:#7aa0ff; --accent-soft:#1c2a4a; --bad:#ff7b6b; --good:#4fcf86; --good-soft:#163527; --tint:#1d252e;
+  --code-bg:#0f141a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15.5px/1.6 var(--f-body)}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 64px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;gap:16px}.rail{position:static!important}}
+
+/* rail */
+.rail{position:sticky;top:24px;align-self:start;display:flex;flex-direction:column;gap:16px}
+.book{font:600 11px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chap{font:700 34px/1 var(--f-display);color:var(--accent)}
+.rail nav{display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--rule)}
+.rail nav a{color:var(--muted);text-decoration:none;font-size:13.5px;padding:3px 0 3px 12px;margin-left:-2px;border-left:2px solid transparent}
+.rail nav a:hover,.rail nav a:focus-visible{color:var(--ink);border-left-color:var(--accent);outline:none}
+.rail nav a span{font-family:var(--f-mono);font-size:11.5px;margin-right:6px}
+@media (max-width:900px){.rail nav{flex-direction:row;flex-wrap:wrap;border-left:0;gap:4px 12px}.rail nav a{padding:0;border:0;margin:0}}
+
+main{display:flex;flex-direction:column;gap:28px;min-width:0}
+header h1{font:700 clamp(30px,4.4vw,44px)/1.05 var(--f-display);margin:0 0 10px;text-wrap:balance;letter-spacing:-.01em}
+header .lede{font-size:18px;color:var(--muted);margin:0;max-width:62ch}
+header .lede b{color:var(--ink);font-weight:600}
+
+section{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+section > h2{margin:0;font:700 21px/1.2 var(--f-display);display:flex;gap:10px;align-items:baseline;text-wrap:balance}
+section > h2 .n{font:600 13px var(--f-mono);color:var(--accent)}
+p{margin:0;max-width:72ch}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+
+.def{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.def .term{font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:2px}
+.callout{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:12px 16px;border-radius:8px;background:var(--tint)}
+.callout .tag{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.tag.insight{background:var(--accent);color:var(--card)}
+.tag.pitfall{background:var(--bad);color:var(--card)}
+.tag.field{background:var(--muted);color:var(--card)}
+.tag.rule{background:var(--good);color:var(--card)}
+
+.shift{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.shift div{border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.shift .to{border-color:var(--accent);background:var(--accent-soft)}
+.shift small{display:block;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.shift .arr{align-self:center;color:var(--accent);font:600 20px var(--f-mono)}
+@media (max-width:520px){.shift{grid-template-columns:1fr}.shift .arr{transform:rotate(90deg);justify-self:center}}
+
+.jobs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13.5px}
+.jobs span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--card)}
+.jobs i{color:var(--muted);font-style:normal}
+
+.fig{overflow-x:auto;margin:0 -4px}
+.fig svg{display:block;width:100%;min-width:620px;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--muted);margin-top:6px}
+figure{margin:0}
+/* svg tokens */
+.s-box{fill:none;stroke:var(--line);stroke-width:1.25}
+.s-acc{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.s-good{fill:var(--good-soft);stroke:var(--good);stroke-width:2}
+.s-tint{fill:var(--tint);stroke:var(--line);stroke-width:1.25}
+.s-edge{fill:none;stroke:var(--muted);stroke-width:1.25}
+.s-loop{fill:none;stroke:var(--accent);stroke-width:2}
+.s-dash{stroke:var(--muted);stroke-width:1.25;stroke-dasharray:4 4}
+.s-rule{stroke:var(--rule)}
+.m-edge{fill:var(--muted)} .m-loop{fill:var(--accent)}
+svg text{font-family:var(--f-body);fill:var(--ink);font-size:13px}
+svg .t-title{font-size:15px;font-weight:600}
+svg .t-q{fill:var(--muted);font-size:11.5px}
+svg .t-s{font-size:11px;fill:var(--muted)}
+svg .t-b{font-weight:600}
+svg .t-bad{fill:var(--bad);font-size:11.5px}
+svg .t-mono{font-family:var(--f-mono);font-size:12px}
+
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+th{font:600 11.5px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1.5px solid var(--line)}
+td:first-child{font-weight:600;white-space:nowrap}
+td.loop{background:var(--accent-soft)}
+
+pre{margin:0;background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;overflow-x:auto;font:13px/1.55 var(--f-mono)}
+pre .c{color:var(--muted)} pre .k{color:var(--accent);font-weight:500} pre .s{color:var(--good)}
+
+.badge{display:inline-block;font:600 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);vertical-align:middle}
+
+/* Q&A */
+.qa-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{font:500 13px var(--f-body);color:var(--accent);background:transparent;border:1px solid var(--accent);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+.btn:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+details{border:1px solid var(--line);border-radius:8px;background:var(--card)}
+details[open]{border-color:var(--accent)}
+summary{cursor:pointer;list-style:none;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:10px;font-weight:500}
+summary::-webkit-details-marker{display:none}
+summary .qn{font:600 12px var(--f-mono);color:var(--accent);padding-top:2px}
+summary .hint{display:block;font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
+details .ans{padding:0 14px 14px 14px;border-top:1px dashed var(--rule);padding-top:10px;font-size:14.5px}
+details .ans ul{padding-left:18px}
+
+.recap{counter-reset:r;list-style:none;padding:0;display:grid;gap:8px}
+.recap li{counter-increment:r;display:grid;grid-template-columns:28px 1fr;gap:8px}
+.recap li::before{content:counter(r);font:600 12px var(--f-mono);color:var(--card);background:var(--ink);border-radius:50%;width:22px;height:22px;display:grid;place-items:center;margin-top:2px}
+footer{font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+.s-card{fill:var(--card);stroke:var(--line);stroke-width:1.25}
+.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.cards3 > div{border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.cards3 h3{margin:0;font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.cards3 ul{font-size:14px}
+.cards3 .term{border-color:var(--good)}
+.cards3 .term h3{color:var(--good)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="rail">
+    <div>
+      <div class="book">Loop Engineering · Revision</div>
+      <div class="chap">Ch 02</div>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#s1"><span>01</span>60-second recap</a>
+      <a href="#s2"><span>02</span>Observe-reason-act</a>
+      <a href="#s3"><span>03</span>ReAct pattern</a>
+      <a href="#s4"><span>04</span>Plan vs reactive</a>
+      <a href="#s5"><span>05</span>Loop as state machine</a>
+      <a href="#s6"><span>06</span>Two nested loops</a>
+      <a href="#s7"><span>07</span>Sync vs async</a>
+      <a href="#s8"><span>08</span>The loop driver</a>
+      <a href="#s9"><span>09</span>Production lens</a>
+      <a href="#s10"><span>10</span>Self-test Q&amp;A</a>
+      <a href="#s11"><span>11</span>Chapter summary</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header>
+      <h1>The Core Agent Loop</h1>
+      <p class="lede">An agent is <b>a model calling tools in a loop until the task is complete.</b> It fits on an index card, and every later chapter is built on top of it.</p>
+    </header>
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2><span class="n">01</span>Chapter in 60 seconds</h2>
+      <figure class="fig">
+        <svg viewBox="0 0 760 250" role="img" aria-label="Everything in the book stands on one primitive">
+          <text x="24" y="28" class="t-title">Everything in the book stands on one primitive</text>
+          <g class="s-edge"><path d="M116 108V132"/><path d="M292 108V132"/><path d="M468 108V132"/><path d="M644 108V132"/></g>
+          <rect x="34" y="56" width="164" height="52" rx="8" class="s-box"/><text x="116" y="78" text-anchor="middle">Verification</text><text x="116" y="96" text-anchor="middle">layers</text>
+          <rect x="210" y="56" width="164" height="52" rx="8" class="s-box"/><text x="292" y="78" text-anchor="middle">Multi-agent</text><text x="292" y="96" text-anchor="middle">coordination</text>
+          <rect x="386" y="56" width="164" height="52" rx="8" class="s-box"/><text x="468" y="78" text-anchor="middle">Event-driven</text><text x="468" y="96" text-anchor="middle">triggers</text>
+          <rect x="562" y="56" width="164" height="52" rx="8" class="s-box"/><text x="644" y="78" text-anchor="middle">Self-improving</text><text x="644" y="96" text-anchor="middle">harnesses</text>
+          <rect x="34" y="132" width="692" height="72" rx="8" class="s-acc"/>
+          <text x="380" y="158" text-anchor="middle" class="t-b">Core agent loop</text>
+          <text x="380" y="178" text-anchor="middle" font-size="12">a model decides, a tool runs, a result comes back, repeat</text>
+          <text x="380" y="194" text-anchor="middle" class="t-s">about 120 lines in the reference repo</text>
+          <text x="380" y="232" text-anchor="middle" class="t-bad">A wobble at the centre becomes a collapse at the edges</text>
+        </svg>
+      </figure>
+      <ul>
+        <li><b>The danger of a small primitive:</b> it invites you to bolt features on before the core is sound.</li>
+        <li><b>The one edge that matters:</b> observation → reasoning. Without it you have a chain.</li>
+        <li><b>Get this loop wrong</b> (no verification, no budget, observations discarded) and nothing above it is reliable.</li>
+      </ul>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2><span class="n">02</span>Observe, reason, act, observe</h2>
+      <p>A closed feedback loop: observe the environment, reason about the next move, act, observe the new state. Repeat until a termination condition fires.</p>
+      <figure class="fig">
+        <svg viewBox="0 0 760 272" role="img" aria-label="The loop exits only when the goal is met and verified">
+          <defs>
+            <marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="b1l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">The loop exits only when the goal is met and verified</text>
+          <path d="M170 120H200" class="s-edge" marker-end="url(#b1)"/><path d="M340 120H370" class="s-edge" marker-end="url(#b1)"/><path d="M530 120H562" class="s-edge" marker-end="url(#b1)"/><path d="M640 164V208" class="s-edge" marker-end="url(#b1)"/>
+          <rect x="30" y="94" width="140" height="52" rx="8" class="s-box"/><text x="100" y="116" text-anchor="middle" class="t-b">Reason</text><text x="100" y="134" text-anchor="middle" class="t-s">choose an action</text>
+          <rect x="200" y="94" width="140" height="52" rx="8" class="s-box"/><text x="270" y="116" text-anchor="middle" class="t-b">Act</text><text x="270" y="134" text-anchor="middle" class="t-s">execute a tool call</text>
+          <rect x="370" y="94" width="160" height="52" rx="8" class="s-box"/><text x="450" y="116" text-anchor="middle" class="t-b">Observe</text><text x="450" y="134" text-anchor="middle" class="t-s">result or error</text>
+          <polygon points="562,120 640,76 718,120 640,164" class="s-box"/><text x="640" y="116" text-anchor="middle" font-size="12">Goal met</text><text x="640" y="132" text-anchor="middle" font-size="12">&amp; verified?</text>
+          <rect x="570" y="208" width="140" height="36" rx="18" class="s-good"/><text x="640" y="231" text-anchor="middle" class="t-b">Succeeded</text>
+          <text x="650" y="192" class="t-q">yes</text>
+          <path d="M640 76V60H100V94" class="s-loop" marker-end="url(#b1l)"/>
+          <text x="370" y="52" text-anchor="middle" font-size="11.5">no: the observation becomes new context</text>
+        </svg>
+      </figure>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2><span class="n">03</span>The ReAct pattern (Reason + Act)</h2>
+      <p>Interleave explicit reasoning with actions instead of asking for the answer in one shot. In a coding agent it looks like this:</p>
+      <figure class="fig">
+        <svg viewBox="0 0 760 318" role="img" aria-label="ReAct: every failure becomes input to the next step">
+          <defs>
+            <marker id="b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="b2l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">ReAct: every failure becomes input to the next step</text>
+          <path d="M165 150H195" class="s-edge" marker-end="url(#b2)"/><path d="M335 150H365" class="s-edge" marker-end="url(#b2)"/><path d="M535 150H565" class="s-edge" marker-end="url(#b2)"/><path d="M625 110V84" class="s-edge" marker-end="url(#b2)"/>
+          <rect x="25" y="124" width="140" height="52" rx="8" class="s-box"/><text x="95" y="146" text-anchor="middle">1 Understand</text><text x="95" y="164" text-anchor="middle">the goal</text>
+          <rect x="195" y="124" width="140" height="52" rx="8" class="s-box"/><text x="265" y="155" text-anchor="middle">2 Write code</text>
+          <rect x="365" y="124" width="170" height="52" rx="8" class="s-box"/><text x="450" y="146" text-anchor="middle">3 Run it, observe</text><text x="450" y="164" text-anchor="middle">output or error</text>
+          <polygon points="565,150 625,110 685,150 625,190" class="s-box"/><text x="625" y="154" text-anchor="middle" font-size="12">Tests pass?</text>
+          <rect x="565" y="52" width="120" height="32" rx="16" class="s-good"/><text x="625" y="73" text-anchor="middle" class="t-b">Done</text>
+          <text x="635" y="102" class="t-q">yes</text>
+          <path d="M625 190V246" class="s-loop" marker-end="url(#b2l)"/><text x="635" y="224" class="t-q">no</text>
+          <rect x="540" y="246" width="170" height="52" rx="8" class="s-acc"/><text x="625" y="268" text-anchor="middle" class="t-b">4 Reason about</text><text x="625" y="286" text-anchor="middle" class="t-b">what went wrong</text>
+          <path d="M540 270H525" class="s-loop" marker-end="url(#b2l)"/>
+          <rect x="375" y="246" width="150" height="48" rx="8" class="s-box"/><text x="450" y="274" text-anchor="middle">5 Revise</text>
+          <path d="M450 246V176" class="s-loop" marker-end="url(#b2l)"/>
+          <text x="440" y="216" text-anchor="end" font-size="11.5">6 re-run, repeat</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag insight">Key insight</span><p>A test failure is new context the model did not have before. The loop's whole value comes from feeding it into the next reasoning step instead of discarding it.</p></div>
+      <p><b>Why it beats one-shot:</b> reasoning-only and acting-only agents both underperform the interleaved version, because each step is conditioned on a real observation.</p>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2><span class="n">04</span>Plan-and-execute vs reactive loops</h2>
+      <figure class="fig">
+        <svg viewBox="0 0 760 296" role="img" aria-label="Two ways to sequence actions inside the loop">
+          <defs>
+            <marker id="b3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="b3l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="26" class="t-title">Two ways to sequence actions inside the loop</text>
+          <rect x="24" y="42" width="348" height="214" rx="8" class="s-tint"/>
+          <text x="40" y="66" class="t-b">Plan-and-execute</text>
+          <rect x="98" y="80" width="200" height="36" rx="8" class="s-card"/><text x="198" y="103" text-anchor="middle" font-size="12.5">Plan: all steps up front</text>
+          <path d="M120 116V142" class="s-edge" marker-end="url(#b3)"/>
+          <rect x="60" y="142" width="80" height="36" rx="8" class="s-card"/><text x="100" y="165" text-anchor="middle" font-size="12.5">Step 1</text>
+          <rect x="158" y="142" width="80" height="36" rx="8" class="s-card"/><text x="198" y="165" text-anchor="middle" font-size="12.5">Step 2</text>
+          <rect x="256" y="142" width="80" height="36" rx="8" class="s-card"/><text x="296" y="165" text-anchor="middle" font-size="12.5">Step 3</text>
+          <path d="M140 160H158" class="s-edge" marker-end="url(#b3)"/><path d="M238 160H256" class="s-edge" marker-end="url(#b3)"/>
+          <path d="M198 178V206H44V98H98" class="s-loop" marker-end="url(#b3l)"/>
+          <text x="208" y="228" text-anchor="middle" font-size="11.5">replan when a step proves the plan wrong</text>
+          <rect x="388" y="42" width="348" height="214" rx="8" class="s-tint"/>
+          <text x="404" y="66" class="t-b">Reactive (improvisational)</text>
+          <rect x="472" y="80" width="180" height="36" rx="8" class="s-card"/><text x="562" y="103" text-anchor="middle" font-size="12.5">Current state</text>
+          <rect x="462" y="142" width="200" height="36" rx="8" class="s-card"/><text x="562" y="165" text-anchor="middle" font-size="12.5">Decide ONE next action</text>
+          <rect x="472" y="204" width="180" height="36" rx="8" class="s-card"/><text x="562" y="227" text-anchor="middle" font-size="12.5">Act and observe</text>
+          <path d="M562 116V142" class="s-edge" marker-end="url(#b3)"/><path d="M562 178V204" class="s-edge" marker-end="url(#b3)"/>
+          <path d="M652 222H712V98H652" class="s-loop" marker-end="url(#b3l)"/>
+          <text x="720" y="66" text-anchor="end" class="t-q">no upfront plan</text>
+          <text x="198" y="282" text-anchor="middle" class="t-q">Ordered, interdependent tasks</text>
+          <text x="562" y="282" text-anchor="middle" class="t-q">Open-ended exploration</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag pitfall">Pitfall</span><p>Plan-and-execute can over-commit to a bad plan. If step two shows the plan is wrong, revise it; don't push through the rest. <b>A plan-and-execute loop with no replanning is a chain wearing a loop's clothing.</b></p></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Dimension</th><th>Plan-and-execute</th><th>Reactive</th></tr></thead>
+        <tbody>
+          <tr><td>Decision granularity</td><td>Full multi-step plan up front</td><td>One next action at a time</td></tr>
+          <tr><td>Best for</td><td>Ordered, interdependent tasks (migrations, multi-file features)</td><td>Open-ended exploration (debugging, unfamiliar APIs)</td></tr>
+          <tr><td>Failure mode</td><td>Over-commits to a wrong plan</td><td>Wanders without global direction</td></tr>
+          <tr><td>Recovery</td><td>Needs an explicit replanning trigger</td><td>Naturally re-decides each step</td></tr>
+          <tr><td>Token cost</td><td>Higher up front, lower per step</td><td>Lower up front, can drift higher</td></tr>
+          <tr><td>Observability</td><td>The plan is an auditable artifact</td><td>Intent is implicit in the trace</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><span class="tag rule">Rule</span><p>Neither dominates. Mature loops often <b>start reactive</b> and promote to plan-and-execute once the task structure is understood.</p></div>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2><span class="n">05</span>The agent loop as a state machine</h2>
+      <p>A set of states, transitions between them, and one or more terminal states.</p>
+      <div class="cards3">
+        <div><h3>States</h3><ul><li>planning</li><li>gathering context</li><li>executing a tool call</li><li>awaiting tool result</li><li>reasoning over a result</li><li>awaiting human input</li></ul></div>
+        <div><h3>Transitions = events</h3><ul><li>a tool call returns</li><li>a verifier passes or fails</li><li>a budget is exhausted</li><li>a human approves or rejects</li></ul></div>
+        <div class="term"><h3>Terminal: few, explicit</h3><ul><li><b>SUCCEEDED</b>: verified completion</li><li><b>BLOCKED</b>: needs a human (credentials, judgement call, vetoed action)</li><li><b>FAILED</b>: retries or budget exhausted</li></ul></div>
+      </div>
+      <div class="tbl"><table>
+        <thead><tr><th>Gap a state machine exposes</th><th>What it looks like in production</th></tr></thead>
+        <tbody>
+          <tr><td>State with no exit transition</td><td>The loop hangs</td></tr>
+          <tr><td>Transition with no clear trigger</td><td>Behaviour nobody can explain from the log</td></tr>
+          <tr><td>Terminal state unreachable from a branch</td><td>That path can never legitimately stop</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><b>Why not a while-loop with ifs?</b> There the state hides in local variables; you must read the whole function to know if it can terminate.</li>
+        <li><b>Few terminal states:</b> the caller knows to retry, escalate or alert. "Partially done" or "done but unsure" pushes ambiguity onto every consumer.</li>
+        <li><code>LoopState.transition_to</code> records every edge, so a finished run carries its own audit trail.</li>
+      </ul>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2><span class="n">06</span>Two nested loops</h2>
+      <figure class="fig">
+        <svg viewBox="0 0 760 276" role="img" aria-label="Leverage lives in the outer loop, not the sampler">
+          <text x="24" y="28" class="t-title">Leverage lives in the outer loop, not the sampler</text>
+          <rect x="24" y="48" width="712" height="204" rx="10" class="s-acc"/>
+          <text x="44" y="74" class="t-b">Step-orchestration loop: you design this</text>
+          <rect x="44" y="96" width="320" height="36" rx="8" class="s-card"/><text x="60" y="119" font-size="12.5">which tool to call</text>
+          <rect x="44" y="144" width="320" height="36" rx="8" class="s-card"/><text x="60" y="167" font-size="12.5">what context to assemble</text>
+          <rect x="44" y="192" width="320" height="36" rx="8" class="s-card"/><text x="60" y="215" font-size="12.5">when to stop</text>
+          <rect x="400" y="96" width="312" height="132" rx="8" class="s-card"/>
+          <text x="420" y="122" class="t-b">Token-generation loop</text>
+          <text x="420" y="144" font-size="12">inside the model, one token at a time</text>
+          <text x="420" y="162" font-size="12">not designed by the loop engineer</text>
+          <text x="420" y="196" class="t-q">its knobs: temperature, top-p</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag field">From the field</span><p>Newcomers "optimise the loop" by changing temperature or top-p. That only touches the inner loop. <b>Tune the architecture before tuning the sampler.</b></p></div>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2><span class="n">07</span>Synchronous vs asynchronous execution</h2>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th>Synchronous</th><th>Asynchronous</th></tr></thead>
+        <tbody>
+          <tr><td>How it runs</td><td>Caller blocks until each iteration finishes</td><td>Runs in the background; caller is notified, polls, or is interrupted</td></tr>
+          <tr><td>Needed when</td><td>Interactive sessions, first builds</td><td>Longer than a session tolerates, or on a schedule with no human (Ch 11)</td></tr>
+          <tr><td>Debugging</td><td>Easy: a hang reproduces on the spot</td><td>Hard: it failed three hours ago, in the background</td></tr>
+          <tr><td>Adds</td><td>Nothing extra</td><td class="loop">Durable, resumable state · idempotent actions · out-of-band notification</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><span class="tag rule">Best practice</span><p>Start every new agentic system synchronous, even if the end state is event-driven. Move to async only once the sync version is reliable. The real cost of async is the state and idempotency discipline, not the concurrency primitives.</p></div>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2><span class="n">08</span>The loop driver: <code>AgentLoop.run</code></h2>
+      <p>About 120 lines. What matters is that every stop is a named decision and every transition is observable.</p>
+      <figure class="fig">
+        <svg viewBox="0 0 760 568" role="img" aria-label="Every stop is a named decision; the gate runs before each model call">
+          <defs>
+            <marker id="b4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="b4l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">Every stop is a named decision; the gate runs before each model call</text>
+          <!-- forward edges -->
+          <path d="M300 100V130" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M300 170V194" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M300 266V286" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M300 354V390" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M300 430V460" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M420 80H500" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M370 230H470" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M560 210V166" class="s-edge" marker-end="url(#b4)"/>
+          <path d="M370 320H480" class="s-edge" marker-end="url(#b4)"/>
+          <!-- nodes -->
+          <rect x="180" y="60" width="240" height="40" rx="8" class="s-acc"/><text x="300" y="77" text-anchor="middle" class="t-b">1 Control gate</text><text x="300" y="93" text-anchor="middle" class="t-mono" font-size="10.5">policy.check_terminal(state)</text>
+          <rect x="500" y="66" width="200" height="28" rx="14" class="s-box"/><text x="600" y="85" text-anchor="middle" class="t-mono">FAILED / BLOCKED</text>
+          <text x="460" y="72" text-anchor="middle" class="t-q">limit hit</text>
+          <rect x="180" y="130" width="240" height="40" rx="8" class="s-box"/><text x="300" y="147" text-anchor="middle" class="t-b">2 Reason</text><text x="300" y="163" text-anchor="middle" class="t-mono" font-size="10.5">llm.complete(messages, tools)</text>
+          <rect x="480" y="138" width="160" height="28" rx="14" class="s-good"/><text x="560" y="157" text-anchor="middle" class="t-mono t-b">SUCCEEDED</text>
+          <polygon points="230,230 300,194 370,230 300,266" class="s-box"/><text x="300" y="234" text-anchor="middle" font-size="12">Wants a tool?</text>
+          <text x="420" y="222" text-anchor="middle" class="t-q">no: final answer</text>
+          <rect x="470" y="210" width="180" height="40" rx="8" class="s-box"/><text x="560" y="227" text-anchor="middle" class="t-b">3a Verify</text><text x="560" y="243" text-anchor="middle" class="t-mono" font-size="10.5">self._verify(state)</text>
+          <text x="570" y="194" class="t-q">pass</text>
+          <text x="310" y="280" class="t-q">yes</text>
+          <polygon points="230,320 300,286 370,320 300,354" class="s-box"/><text x="300" y="324" text-anchor="middle" font-size="12">Vetoed?</text>
+          <text x="425" y="312" text-anchor="middle" class="t-q">vetoed</text>
+          <rect x="480" y="306" width="160" height="28" rx="14" class="s-box"/><text x="560" y="325" text-anchor="middle" class="t-mono">BLOCKED</text>
+          <text x="310" y="378" class="t-q">allowed</text>
+          <rect x="180" y="390" width="240" height="40" rx="8" class="s-box"/><text x="300" y="407" text-anchor="middle" class="t-b">ACTING</text><text x="300" y="423" text-anchor="middle" class="t-mono" font-size="10.5">tools.invoke(name, args)</text>
+          <rect x="180" y="460" width="240" height="40" rx="8" class="s-box"/><text x="300" y="477" text-anchor="middle" class="t-b">OBSERVING</text><text x="300" y="493" text-anchor="middle" class="t-mono" font-size="10.5">add_message("tool", result)</text>
+          <!-- back edges -->
+          <path d="M650 230H700V540H60V80H180" class="s-loop" marker-end="url(#b4l)"/>
+          <path d="M300 500V540" class="s-loop"/>
+          <text x="692" y="400" text-anchor="end" font-size="11.5">verify failed:</text>
+          <text x="692" y="416" text-anchor="end" font-size="11.5">failure fed back</text>
+          <text x="70" y="300" font-size="11.5">next</text><text x="70" y="316" font-size="11.5">iteration</text>
+        </svg>
+      </figure>
+<pre><span class="k">while not</span> state.phase.is_terminal:
+    terminal = self.policy.check_terminal(state)        <span class="c"># 1) gate FIRST (Ch 3)</span>
+    <span class="k">if</span> terminal: state.transition_to(*terminal); <span class="k">break</span>
+    state.iteration += 1
+    response = self.llm.complete(state.messages, tools=self.tools.schemas())  <span class="c"># 2) reason</span>
+    <span class="k">if not</span> response.wants_tool:                           <span class="c"># 3a) final answer</span>
+        <span class="k">if</span> self._verify(state): <span class="k">return</span> SUCCEEDED          <span class="c"># verify BEFORE success</span>
+        self._record_no_progress(state); <span class="k">continue</span>          <span class="c"># failure becomes context</span>
+    <span class="k">for</span> call <span class="k">in</span> response.tool_calls:                      <span class="c"># 3b) action path</span>
+        <span class="k">if</span> veto := self.policy.veto_action(state, call.name, call.arguments):
+            <span class="k">return</span> BLOCKED
+        result = self.tools.invoke(call.name, call.arguments)          <span class="c"># ACTING</span>
+        state.add_message(<span class="s">"tool"</span>, result.render(), tool_call_id=call.id)  <span class="c"># OBSERVING</span></pre>
+      <p class="badge" style="align-self:flex-start">Condensed from loop_engineering_lab/core/agent_loop.py</p>
+      <div class="callout"><span class="tag rule">Best practice</span><p>The control gate is the first thing in the loop body, before the model is consulted. Checking budgets before a model call stops the loop from making one extra expensive call past its ceiling on every run.</p></div>
+      <div class="callout"><span class="tag insight">Why verify first</span><p>The model saying "done" is a claim, not a fact. If success keys off a final answer, the loop terminates on confident-but-wrong output, and nothing downstream catches it.</p></div>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <h2><span class="n">09</span>Production lens: the same ideas in LangGraph <span class="badge">not from the book</span></h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Book concept</th><th>LangGraph / LangChain equivalent</th></tr></thead>
+        <tbody>
+          <tr><td>Core ReAct loop</td><td>The prebuilt ReAct agent (<code>create_react_agent</code>; <code>create_agent</code> in LangChain v1): an LLM node + a <code>ToolNode</code> + a conditional edge back to the LLM</td></tr>
+          <tr><td>Plan-and-execute + replan</td><td>Hand-built graph: <code>planner</code> → <code>executor</code> → <code>replan</code> node whose conditional edge loops to <code>executor</code> or ends</td></tr>
+          <tr><td>Control gate / budget</td><td>Attempt counters in state checked by the router, plus <code>recursion_limit</code> in the run config as a hard ceiling</td></tr>
+          <tr><td>Veto → BLOCKED, awaiting human</td><td><code>interrupt()</code> inside a node, resumed with <code>Command(resume=...)</code>; needs a checkpointer</td></tr>
+          <tr><td>Transition log, audit trail</td><td>Checkpointer history per thread; tracing (LangSmith or OpenTelemetry)</td></tr>
+          <tr><td>Sync first, then async</td><td><code>graph.invoke</code> / <code>stream</code> first; <code>ainvoke</code> / background runs later, with a durable checkpointer (Postgres) for resume</td></tr>
+          <tr><td>Tool hang (Ex 2.7)</td><td>Your responsibility: hard timeouts inside every tool function</td></tr>
+          <tr><td>MockLLM for tests (Ex 2.10)</td><td>A fake chat model (e.g. <code>GenericFakeChatModel</code>) injected in place of the real model</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <div class="qa-head">
+        <h2 style="margin:0;font:700 21px/1.2 var(--f-display);display:flex;gap:10px;align-items:baseline"><span class="n" style="font:600 13px var(--f-mono);color:var(--accent)">10</span>Self-test: exercises 2.1–2.10</h2>
+        <button class="btn" id="toggle-all" type="button" aria-pressed="false">Reveal all answers</button>
+      </div>
+      <p>Answer aloud first, then open the card.</p>
+      <div class="qa">
+        <details><summary><span class="qn">2.1</span><span>The core agent loop in one sentence, then each part?<span class="hint">Reason, act, observe.</span></span></summary>
+          <div class="ans">A model calling tools in a loop until the task is complete. <b>Reason</b> over the message history to pick the next action; <b>act</b> by dispatching the tool call; <b>observe</b> by appending the result to history. Repeat until a termination condition fires or a final answer passes verification.</div></details>
+        <details><summary><span class="qn">2.2</span><span>Why an explicit state machine instead of a while-loop with ifs?<span class="hint">Make bugs structurally visible.</span></span></summary>
+          <div class="ans"><ul><li>Exposes phases with no exit (hangs) and terminal states unreachable from a branch.</li><li>Gives one place to log every transition: replay and debugging.</li><li>With ad-hoc ifs, state hides in local variables and control flow.</li></ul></div></details>
+        <details><summary><span class="qn">2.3</span><span>Token-generation loop vs step-orchestration loop: why does it matter?<span class="hint">Where is the leverage?</span></span></summary>
+          <div class="ans">Inner: the model's own token-by-token decoding, which you don't design. Outer: which tool, what context, when to stop, which you do design. Tuning temperature or top-p only touches the inner loop; reliability, cost and correctness live in the outer one.</div></details>
+        <details><summary><span class="qn">2.4</span><span>When plan-and-execute over reactive, and how to prevent over-commitment?<span class="hint">Ordered, compounding tasks.</span></span></summary>
+          <div class="ans">When order matters and early mistakes compound: a multi-file feature, a migration, an interdependent refactor. Add a <b>replanning trigger</b>: after each step, check that reality still matches the plan's assumptions; if not, regenerate the remaining plan.</div></details>
+        <details><summary><span class="qn">2.5</span><span>Why verify before transitioning to success? Where is it in code?<span class="hint">"Done" is a claim.</span></span></summary>
+          <div class="ans">The model declaring done is a claim; verify against tests, a checker or a schema. A failed check becomes new context instead of a silent stop. In <code>AgentLoop.run</code>, the final-answer branch calls <code>self._verify(state)</code> and only then moves to SUCCEEDED; otherwise it records no-progress and continues.</div></details>
+        <details><summary><span class="qn">2.6</span><span>The terminal states, and why keep them few?<span class="hint">Three.</span></span></summary>
+          <div class="ans">SUCCEEDED (verified), BLOCKED (needs a human), FAILED (retries or budget exhausted). Few and explicit tells every caller whether to retry, escalate or alert. "Partially done" states push ambiguity onto consumers and cause multi-agent integration bugs.</div></details>
+        <details><summary><span class="qn">2.7</span><span>An agent loop hangs and never returns. Diagnose.<span class="hint">Transition log; tool timeouts.</span></span></summary>
+          <div class="ans"><ul><li>Read the transition log: which phase is it stuck in?</li><li>Oscillating REASONING ↔ ACTING → misconfigured no-progress detector or tool-call budget.</li><li>Stuck in ACTING → a tool (HTTP, subprocess) with no timeout: the most common cause.</li><li>Fix: gate first in the loop body, hard timeout on every tool, no-progress counter that can drive BLOCKED.</li></ul></div></details>
+        <details><summary><span class="qn">2.8</span><span>What is ReAct, and why beat one-shot generation?<span class="hint">Conditioning on real observations.</span></span></summary>
+          <div class="ans">Interleave reasoning steps with actions. Each action yields an observation the model didn't have, so the next reasoning step is grounded in real feedback. One-shot generation must get everything right blind. Reasoning-only and acting-only both underperform the interleaved version.</div></details>
+        <details><summary><span class="qn">2.9</span><span>Sync vs async: how do you decide, and what changes?<span class="hint">What async forces on you.</span></span></summary>
+          <div class="ans">Build sync first; go async only when runs outlast a session or run on a schedule with no human. Async adds durable, resumable state; idempotent actions (retries don't double side effects); and out-of-band notification.</div></details>
+        <details><summary><span class="qn">2.10</span><span>How do you test the loop without paying for model calls?<span class="hint">Dependency inversion.</span></span></summary>
+          <div class="ans">Depend on an <code>LLMClient</code> protocol with one <code>complete</code> method. Production injects a real adapter; tests inject a deterministic <code>MockLLM</code> (a queue of responses or a <code>policy(messages)</code> function). Then test "budget stops at 3 tool calls" or "failing verifier keeps looping" offline, for free, deterministically.</div></details>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <h2><span class="n">11</span>Chapter summary</h2>
+      <ol class="recap">
+        <li>The core loop is observe, reason, act, observe again, repeated until termination.</li>
+        <li>ReAct interleaves explicit reasoning with action instead of one-shot output.</li>
+        <li>Plan-and-execute suits ordered, interdependent tasks; reactive suits exploration. Both need a way to recover from a wrong initial assumption.</li>
+        <li>A formal state machine surfaces missing transitions and unreachable terminal states before they cause incidents.</li>
+        <li>The token loop (inside the model) and the orchestration loop (around it) are different; loop engineering designs only the outer one.</li>
+        <li>Build synchronously first; go async only once the loop is reliable.</li>
+      </ol>
+      <p><b>Next:</b> Chapter 3 answers the question this chapter deferred: how does the loop know when to stop?</p>
+    </section>
+
+    <footer>Revision notes for <i>Loop Engineering: The Operating Model Behind Modern Agentic AI Systems</i>, Chapter 2.</footer>
+  </main>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('toggle-all');
+  var cards=document.querySelectorAll('#s10 details');
+  function allOpen(){return Array.prototype.every.call(cards,function(d){return d.open});}
+  function sync(){var a=allOpen();btn.textContent=a?'Hide all answers':'Reveal all answers';btn.setAttribute('aria-pressed',String(a));}
+  btn.addEventListener('click',function(){var a=allOpen();cards.forEach(function(d){d.open=!a});sync();});
+  cards.forEach(function(d){d.addEventListener('toggle',sync)});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "loop-engineering-study"
+version = "0.1.0"
+description = "Study builds for Loop Engineering: scratch, LangGraph, and comparison spikes"
+requires-python = ">=3.10"
+authors = [{ name = "Bhakti" }]
+dependencies = [
+    "loop-engineering-lab",
+    "langchain>=0.3",
+    "langchain-core>=0.3",
+    "langchain-community>=0.3",
+    "langchain-openai>=0.3",
+    "langgraph>=0.4",
+    "langgraph-checkpoint-sqlite>=2.0",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "tenacity>=8.0",
+    "pybreaker>=1.0",
+    "opentelemetry-api>=1.20",
+    "opentelemetry-sdk>=1.20",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+    "mypy>=1.10",
+]
+langfuse = ["langfuse>=2.0"]
+langsmith = ["langsmith>=0.1"]
+pydantic-ai = ["pydantic-ai>=0.1"]
+openai-agents = ["openai-agents>=0.1"]
+all = [
+    "loop-engineering-study[dev]",
+    "loop-engineering-study[langfuse]",
+    "loop-engineering-study[langsmith]",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/les"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+asyncio_mode = "auto"
+markers = [
+    "live: requires a real model (deselect with -m 'not live')",
+    "slow: long-running tests",
+]
+
+[tool.ruff]
+src = ["src"]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+packages = ["les"]
+mypy_path = "src"
+
+[tool.uv.sources]
+loop-engineering-lab = { workspace = true }
