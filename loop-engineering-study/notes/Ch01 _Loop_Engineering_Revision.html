@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop Engineering Ch 1 Revision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Plan: engineer's revision sheet. Blueprint-cool paper, ink text, one cobalt accent reserved for feedback/back-edges,
+   red only for chain failure. Left rail = chapter map, right = dense numbered sections, diagrams over paragraphs. */
+:root{
+  --paper:#f4f6f8; --card:#ffffff; --ink:#18212b; --muted:#5b6876; --line:#c4ccd5; --rule:#e2e7ec;
+  --accent:#2a58d0; --accent-soft:#e6edfb; --bad:#c23b2e; --good:#1f8a4c; --good-soft:#e3f3e9; --tint:#eef1f4;
+  --code-bg:#f0f3f6;
+  --f-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#11161c; --card:#171e26; --ink:#e4e9ee; --muted:#97a3b0; --line:#3a4653; --rule:#25303b;
+    --accent:#7aa0ff; --accent-soft:#1c2a4a; --bad:#ff7b6b; --good:#4fcf86; --good-soft:#163527; --tint:#1d252e;
+    --code-bg:#0f141a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#11161c; --card:#171e26; --ink:#e4e9ee; --muted:#97a3b0; --line:#3a4653; --rule:#25303b;
+  --accent:#7aa0ff; --accent-soft:#1c2a4a; --bad:#ff7b6b; --good:#4fcf86; --good-soft:#163527; --tint:#1d252e;
+  --code-bg:#0f141a; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15.5px/1.6 var(--f-body)}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 64px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:40px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;gap:16px}.rail{position:static!important}}
+
+/* rail */
+.rail{position:sticky;top:24px;align-self:start;display:flex;flex-direction:column;gap:16px}
+.book{font:600 11px/1.3 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chap{font:700 34px/1 var(--f-display);color:var(--accent)}
+.rail nav{display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--rule)}
+.rail nav a{color:var(--muted);text-decoration:none;font-size:13.5px;padding:3px 0 3px 12px;margin-left:-2px;border-left:2px solid transparent}
+.rail nav a:hover,.rail nav a:focus-visible{color:var(--ink);border-left-color:var(--accent);outline:none}
+.rail nav a span{font-family:var(--f-mono);font-size:11.5px;margin-right:6px}
+@media (max-width:900px){.rail nav{flex-direction:row;flex-wrap:wrap;border-left:0;gap:4px 12px}.rail nav a{padding:0;border:0;margin:0}}
+
+main{display:flex;flex-direction:column;gap:28px;min-width:0}
+header h1{font:700 clamp(30px,4.4vw,44px)/1.05 var(--f-display);margin:0 0 10px;text-wrap:balance;letter-spacing:-.01em}
+header .lede{font-size:18px;color:var(--muted);margin:0;max-width:62ch}
+header .lede b{color:var(--ink);font-weight:600}
+
+section{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:22px 24px;display:flex;flex-direction:column;gap:14px}
+section > h2{margin:0;font:700 21px/1.2 var(--f-display);display:flex;gap:10px;align-items:baseline;text-wrap:balance}
+section > h2 .n{font:600 13px var(--f-mono);color:var(--accent)}
+p{margin:0;max-width:72ch}
+ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+
+.def{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.def .term{font:600 11.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:2px}
+.callout{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;padding:12px 16px;border-radius:8px;background:var(--tint)}
+.callout .tag{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.tag.insight{background:var(--accent);color:var(--card)}
+.tag.pitfall{background:var(--bad);color:var(--card)}
+.tag.field{background:var(--muted);color:var(--card)}
+.tag.rule{background:var(--good);color:var(--card)}
+
+.shift{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.shift div{border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.shift .to{border-color:var(--accent);background:var(--accent-soft)}
+.shift small{display:block;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.shift .arr{align-self:center;color:var(--accent);font:600 20px var(--f-mono)}
+@media (max-width:520px){.shift{grid-template-columns:1fr}.shift .arr{transform:rotate(90deg);justify-self:center}}
+
+.jobs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13.5px}
+.jobs span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--card)}
+.jobs i{color:var(--muted);font-style:normal}
+
+.fig{overflow-x:auto;margin:0 -4px}
+.fig svg{display:block;width:100%;min-width:620px;height:auto}
+.fig figcaption{font-size:12.5px;color:var(--muted);margin-top:6px}
+figure{margin:0}
+/* svg tokens */
+.s-box{fill:none;stroke:var(--line);stroke-width:1.25}
+.s-acc{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2}
+.s-good{fill:var(--good-soft);stroke:var(--good);stroke-width:2}
+.s-tint{fill:var(--tint);stroke:var(--line);stroke-width:1.25}
+.s-edge{fill:none;stroke:var(--muted);stroke-width:1.25}
+.s-loop{fill:none;stroke:var(--accent);stroke-width:2}
+.s-dash{stroke:var(--muted);stroke-width:1.25;stroke-dasharray:4 4}
+.s-rule{stroke:var(--rule)}
+.m-edge{fill:var(--muted)} .m-loop{fill:var(--accent)}
+svg text{font-family:var(--f-body);fill:var(--ink);font-size:13px}
+svg .t-title{font-size:15px;font-weight:600}
+svg .t-q{fill:var(--muted);font-size:11.5px}
+svg .t-s{font-size:11px;fill:var(--muted)}
+svg .t-b{font-weight:600}
+svg .t-bad{fill:var(--bad);font-size:11.5px}
+svg .t-mono{font-family:var(--f-mono);font-size:12px}
+
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+th{font:600 11.5px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1.5px solid var(--line)}
+td:first-child{font-weight:600;white-space:nowrap}
+td.loop{background:var(--accent-soft)}
+
+pre{margin:0;background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;overflow-x:auto;font:13px/1.55 var(--f-mono)}
+pre .c{color:var(--muted)} pre .k{color:var(--accent);font-weight:500} pre .s{color:var(--good)}
+
+.badge{display:inline-block;font:600 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);vertical-align:middle}
+
+/* Q&A */
+.qa-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{font:500 13px var(--f-body);color:var(--accent);background:transparent;border:1px solid var(--accent);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+.btn:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+details{border:1px solid var(--line);border-radius:8px;background:var(--card)}
+details[open]{border-color:var(--accent)}
+summary{cursor:pointer;list-style:none;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:10px;font-weight:500}
+summary::-webkit-details-marker{display:none}
+summary .qn{font:600 12px var(--f-mono);color:var(--accent);padding-top:2px}
+summary .hint{display:block;font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
+details .ans{padding:0 14px 14px 14px;border-top:1px dashed var(--rule);padding-top:10px;font-size:14.5px}
+details .ans ul{padding-left:18px}
+
+.recap{counter-reset:r;list-style:none;padding:0;display:grid;gap:8px}
+.recap li{counter-increment:r;display:grid;grid-template-columns:28px 1fr;gap:8px}
+.recap li::before{content:counter(r);font:600 12px var(--f-mono);color:var(--card);background:var(--ink);border-radius:50%;width:22px;height:22px;display:grid;place-items:center;margin-top:2px}
+footer{font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="rail">
+    <div>
+      <div class="book">Loop Engineering · Revision</div>
+      <div class="chap">Ch 01</div>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#s1"><span>01</span>60-second recap</a>
+      <a href="#s2"><span>02</span>Why one-shot fails</a>
+      <a href="#s3"><span>03</span>Chain vs loop</a>
+      <a href="#s4"><span>04</span>Five-stage anatomy</a>
+      <a href="#s5"><span>05</span>Prompt vs loop eng.</a>
+      <a href="#s6"><span>06</span>Why coding first</a>
+      <a href="#s7"><span>07</span>Stages in code</a>
+      <a href="#s8"><span>08</span>Production lens</a>
+      <a href="#s9"><span>09</span>Self-test Q&amp;A</a>
+      <a href="#s10"><span>10</span>Chapter summary</a>
+    </nav>
+  </aside>
+
+  <main>
+    <header>
+      <h1>From Prompting to Looping</h1>
+      <p class="lede">The unit of work is no longer the prompt; <b>it is the loop.</b> Stop prompting the agent turn by turn and build the system that prompts it.</p>
+    </header>
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2><span class="n">01</span>Chapter in 60 seconds</h2>
+      <div class="shift">
+        <div><small>Before</small>Holding the tool: write a prompt, read the reply, type the next instruction.</div>
+        <div class="arr" aria-hidden="true">→</div>
+        <div class="to"><small>Now</small>Building the system that holds the tool, then letting it drive the agent.</div>
+      </div>
+      <div class="def"><span class="term">Definition · Loop engineering</span>The discipline of designing, operating and improving the iterative cycles that let an AI system pursue a goal across multiple steps, rather than produce a single response. A loop engineer builds the system that prompts the agent, instead of prompting the agent directly.</div>
+      <p><b>What that system does, every iteration:</b></p>
+      <div class="jobs"><span>finds the work</span><i>→</i><span>hands it to the agent</span><i>→</i><span>checks the result</span><i>→</i><span>records what was done</span><i>→</i><span>decides the next action</span></div>
+      <ul>
+        <li><b>Skill shift:</b> phrasing a request well → designing a system that pursues a goal, reads the consequences of its own actions, and corrects course with no human retyping.</li>
+        <li><b>Abstraction moves up one level:</b> from authoring prompts to authoring the loop that authors prompts.</li>
+      </ul>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2><span class="n">02</span>Why one-shot prompting hits a ceiling</h2>
+      <p>A single response cannot run itself, test itself, notice it was wrong, and try again.</p>
+      <figure class="fig">
+        <svg viewBox="0 0 760 300" role="img" aria-label="The signal that matters arrives after the first response">
+          <defs>
+            <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="a1l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">The signal that matters arrives after the first response</text>
+          <line x1="362" y1="66" x2="362" y2="232" class="s-dash"/>
+          <text x="362" y="58" text-anchor="middle" class="t-q">one-shot prompt stops listening here</text>
+          <path d="M150 160H175" class="s-edge" marker-end="url(#a1)"/>
+          <path d="M325 160H400" class="s-edge" marker-end="url(#a1)"/>
+          <rect x="30" y="138" width="120" height="44" rx="8" class="s-box"/><text x="90" y="164" text-anchor="middle">Prompt</text>
+          <rect x="175" y="138" width="150" height="44" rx="8" class="s-box"/><text x="250" y="164" text-anchor="middle">First response</text>
+          <rect x="400" y="72" width="280" height="156" rx="8" class="s-tint"/>
+          <text x="416" y="94" class="t-b">Signals that arrive later</text>
+          <rect x="416" y="107" width="248" height="30" rx="8" class="s-box"/><text x="540" y="126" text-anchor="middle" font-size="12.5">Failing test = new context</text>
+          <rect x="416" y="145" width="248" height="30" rx="8" class="s-box"/><text x="540" y="164" text-anchor="middle" font-size="12.5">Type error = wrong assumption</text>
+          <rect x="416" y="183" width="248" height="30" rx="8" class="s-box"/><text x="540" y="202" text-anchor="middle" font-size="12.5">Review comment = next action</text>
+          <path d="M540 228V262H250V182" class="s-loop" marker-end="url(#a1l)"/>
+          <text x="395" y="282" text-anchor="middle" font-size="11.5">A loop feeds these back as input to the next attempt</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag insight">Key insight</span><p>A strong first answer is not the same as a correct final change. Loop engineering makes post-action signals part of the system instead of after-the-fact cleanup.</p></div>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2><span class="n">03</span>Chain vs loop</h2>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th>Chain</th><th>Loop</th></tr></thead>
+        <tbody>
+          <tr><td>Definition</td><td>Fixed linear sequence A → B → C, run in a set order regardless of intermediate results</td><td class="loop">Repeating cycle: each iteration's outcome decides whether and how the next one runs</td></tr>
+          <tr><td>Strength</td><td>Predictable, easy to trace, cheap</td><td class="loop">Flexible; recovers from a wrong assumption</td></tr>
+          <tr><td>Best for</td><td>Well-understood, low-uncertainty tasks</td><td class="loop">Path unknown in advance: an unfamiliar error, an undocumented API, a partly visible codebase</td></tr>
+          <tr><td>Can change course?</td><td>No</td><td class="loop">Yes: accept, retry differently, or stop</td></tr>
+        </tbody>
+      </table></div>
+      <figure class="fig">
+        <svg viewBox="0 0 760 352" role="img" aria-label="A chain carries an early error forward; a loop catches it">
+          <defs>
+            <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="a2l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">A chain carries an early error forward; a loop catches it</text>
+          <text x="24" y="48" class="t-q">Book example: OCR a PDF, summarise it, email the summary</text>
+          <text x="24" y="114" class="t-b">Chain</text>
+          <path d="M260 110H300" class="s-edge" marker-end="url(#a2)"/><path d="M440 110H480" class="s-edge" marker-end="url(#a2)"/>
+          <rect x="120" y="88" width="140" height="44" rx="8" class="s-box"/><text x="190" y="114" text-anchor="middle">OCR the PDF</text>
+          <rect x="300" y="88" width="140" height="44" rx="8" class="s-box"/><text x="370" y="114" text-anchor="middle">Summarise</text>
+          <rect x="480" y="88" width="140" height="44" rx="8" class="s-box"/><text x="550" y="114" text-anchor="middle">Email summary</text>
+          <text x="370" y="156" text-anchor="middle" class="t-bad">Garbage OCR flows through every later step, confidently</text>
+          <line x1="24" y1="184" x2="736" y2="184" class="s-rule"/>
+          <text x="24" y="254" class="t-b">Loop</text>
+          <path d="M235 250H260" class="s-edge" marker-end="url(#a2)"/><path d="M400 250H424" class="s-edge" marker-end="url(#a2)"/><path d="M536 250H565" class="s-edge" marker-end="url(#a2)"/>
+          <rect x="105" y="228" width="130" height="44" rx="8" class="s-box"/><text x="170" y="254" text-anchor="middle">OCR the PDF</text>
+          <rect x="260" y="228" width="140" height="44" rx="8" class="s-box"/><text x="330" y="254" text-anchor="middle">Verify text quality</text>
+          <polygon points="424,250 480,214 536,250 480,286" class="s-box"/><text x="480" y="254" text-anchor="middle">Text OK?</text>
+          <rect x="565" y="228" width="150" height="44" rx="8" class="s-acc"/><text x="640" y="254" text-anchor="middle" class="t-b">Summarise + email</text>
+          <text x="550" y="240" text-anchor="middle" class="t-q">yes</text>
+          <path d="M480 286V314H170V272" class="s-loop" marker-end="url(#a2l)"/>
+          <text x="325" y="334" text-anchor="middle" font-size="11.5">no: retry with another OCR engine or a deskew pass</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag pitfall">Pitfall</span><p>A chain cannot recover from a wrong assumption at step one. It faithfully runs steps two through ten on a broken foundation. That confidently wrong output is the most common reason teams move to loops.</p></div>
+      <div class="callout"><span class="tag rule">Rule</span><p>Pick the cheapest structure that meets the reliability bar. Start with a chain; add loops exactly where uncertainty and recoverable failure live.</p></div>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2><span class="n">04</span>Five-stage anatomy of every loop</h2>
+      <figure class="fig">
+        <svg viewBox="0 0 760 272" role="img" aria-label="The value is in closing the loop, not in any single stage">
+          <defs>
+            <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="a3l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">The value is in closing the loop, not in any single stage</text>
+          <text x="24" y="48" class="t-q">Every agentic loop, in any domain, reduces to these five stages</text>
+          <path d="M156 144H172" class="s-edge" marker-end="url(#a3)"/><path d="M300 144H316" class="s-edge" marker-end="url(#a3)"/><path d="M444 144H460" class="s-edge" marker-end="url(#a3)"/><path d="M588 144H604" class="s-edge" marker-end="url(#a3)"/><path d="M668 100V76" class="s-edge" marker-end="url(#a3)"/>
+          <text x="736" y="68" text-anchor="end" class="t-q">exit when accepted or blocked</text>
+          <rect x="28" y="100" width="128" height="88" rx="8" class="s-box"/>
+          <text x="40" y="124" class="t-b">1 Intent</text><text x="40" y="144" class="t-s">define the target</text><text x="40" y="160" class="t-s">outcome</text>
+          <rect x="172" y="100" width="128" height="88" rx="8" class="s-box"/>
+          <text x="184" y="124" class="t-b">2 Context</text><text x="184" y="144" class="t-s">code, docs,</text><text x="184" y="160" class="t-s">errors, logs,</text><text x="184" y="176" class="t-s">constraints</text>
+          <rect x="316" y="100" width="128" height="88" rx="8" class="s-box"/>
+          <text x="328" y="124" class="t-b">3 Action</text><text x="328" y="144" class="t-s">edit files, run</text><text x="328" y="160" class="t-s">commands, call</text><text x="328" y="176" class="t-s">tools, plan</text>
+          <rect x="460" y="100" width="128" height="88" rx="8" class="s-box"/>
+          <text x="472" y="124" class="t-b">4 Observation</text><text x="472" y="144" class="t-s">tests, compiler</text><text x="472" y="160" class="t-s">errors, output,</text><text x="472" y="176" class="t-s">diffs, reviews</text>
+          <rect x="604" y="100" width="128" height="88" rx="8" class="s-acc"/>
+          <text x="616" y="124" class="t-b">5 Adjustment</text><text x="616" y="144" font-size="11">update the plan,</text><text x="616" y="160" font-size="11">then repeat</text>
+          <path d="M668 188V226H236V188" class="s-loop" marker-end="url(#a3l)"/>
+          <text x="452" y="248" text-anchor="middle" font-size="11.5">not accepted yet: the observation becomes new context, go again</text>
+        </svg>
+      </figure>
+      <div class="tbl"><table>
+        <thead><tr><th>Signal</th><th>Read it as</th></tr></thead>
+        <tbody>
+          <tr><td>Test failure</td><td>New context the model did not have before</td></tr>
+          <tr><td>Type error</td><td>Proof that an assumption was wrong</td></tr>
+          <tr><td>Review comment</td><td>Another observation that drives the next action</td></tr>
+        </tbody>
+      </table></div>
+      <p><span class="badge">Mnemonic</span> &nbsp;<b>I · C · A · O · A</b> — Intent, Context, Action, Observation, Adjustment.</p>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2><span class="n">05</span>Prompt engineering vs loop engineering</h2>
+      <p>They are complementary. Prompt engineering shapes the input to a model; loop engineering shapes the entire process around it.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Dimension</th><th>Prompt engineering</th><th>Loop engineering</th></tr></thead>
+        <tbody>
+          <tr><td>Primary unit</td><td>A prompt or instruction</td><td class="loop">A repeated workflow</td></tr>
+          <tr><td>Goal</td><td>Better first response</td><td class="loop">Better final outcome</td></tr>
+          <tr><td>Feedback</td><td>Usually human evaluation</td><td class="loop">Tests, tools, diffs, logs, reviews and humans</td></tr>
+          <tr><td>Failure mode</td><td>The model gives a weak answer</td><td class="loop">The system loops poorly, stops early, or ignores evidence</td></tr>
+          <tr><td>Best for</td><td>Isolated answers and generation</td><td class="loop">Real tasks with uncertainty</td></tr>
+          <tr><td>Reflex when attempt 1 fails</td><td>Write a better prompt</td><td class="loop">Add a verifier and feed the failure back</td></tr>
+        </tbody>
+      </table></div>
+      <p>Prompts still matter <i>inside</i> the loop: they shape the first plan, cut exploration and iteration count, and improve tool-call arguments. They stop being the top-level control surface.</p>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2><span class="n">06</span>Why coding first, and where the idea comes from</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Domain</th><th>Verification signal</th><th>Loop fit</th></tr></thead>
+        <tbody>
+          <tr><td>Coding</td><td>Compile, type-check, lint, test: dense, cheap, automatic, machine-readable</td><td class="loop">Strong: matured here first</td></tr>
+          <tr><td>Customer support</td><td>"Was the customer satisfied?": sparse, subjective, slow, expensive</td><td>Weak</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout"><span class="tag rule">Rule</span><p>A loop is only as good as its verification signal's quality and latency. First design question: <b>what is my cheap, automatic verifier?</b> If the honest answer is "a human reads it", the loop will be slow and expensive.</p></div>
+      <figure class="fig">
+        <svg viewBox="0 0 760 280" role="img" aria-label="Old ideas, new actor: one LLM now plans, acts and verifies">
+          <defs><marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker></defs>
+          <text x="24" y="28" class="t-title">Old ideas, new actor: one LLM now plans, acts and verifies</text>
+          <path d="M284 84H340V138H400" class="s-edge" marker-end="url(#a4)"/><path d="M284 156H400" class="s-edge" marker-end="url(#a4)"/><path d="M284 228H340V174H400" class="s-edge" marker-end="url(#a4)"/>
+          <rect x="24" y="56" width="260" height="56" rx="8" class="s-box"/><text x="40" y="80" class="t-b">OODA loop</text><text x="40" y="98" class="t-q">Observe-Orient-Decide-Act</text>
+          <rect x="24" y="128" width="260" height="56" rx="8" class="s-box"/><text x="40" y="152" class="t-b">ReAct (Reason + Act)</text><text x="40" y="170" class="t-q">interleave reasoning with tool use</text>
+          <rect x="24" y="200" width="260" height="56" rx="8" class="s-box"/><text x="40" y="224" class="t-b">Plan-act-verify</text><text x="40" y="242" class="t-q">execute a plan, check vs reality</text>
+          <rect x="400" y="112" width="336" height="88" rx="8" class="s-acc"/>
+          <text x="416" y="136" class="t-b">New: one LLM plays all three roles</text>
+          <text x="416" y="154" font-size="11.5">planner, actor and verifier in one system</text>
+          <text x="416" y="170" font-size="11.5">reads a stack trace, hypothesises a cause,</text>
+          <text x="416" y="186" font-size="11.5">writes the fix itself</text>
+        </svg>
+      </figure>
+      <div class="callout"><span class="tag field">From the field</span><p>Anyone who built a CI/CD pipeline with automatic retries, or a robotics control loop, has done a version of this. What changed is the actor inside the loop.</p></div>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2><span class="n">07</span>The five stages in code</h2>
+      <p>The book's repo encodes the anatomy as an explicit, serialisable state machine. Every transition is recorded so a run can be replayed.</p>
+      <figure class="fig">
+        <svg viewBox="0 0 760 384" role="img" aria-label="A loop is defined by the edges back into REASONING">
+          <defs>
+            <marker id="a5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-edge"/></marker>
+            <marker id="a5l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="m-loop"/></marker>
+          </defs>
+          <text x="24" y="28" class="t-title">A loop is defined by the edges back into REASONING</text>
+          <text x="24" y="48" class="t-q">LoopPhase in loop_engineering_lab/core/state.py, walked by core/agent_loop.py</text>
+          <path d="M172 96H196" class="s-edge" marker-end="url(#a5)"/><path d="M344 96H368" class="s-edge" marker-end="url(#a5)"/><path d="M516 96H540" class="s-edge" marker-end="url(#a5)"/><path d="M614 118V194" class="s-edge" marker-end="url(#a5)"/><path d="M540 216H516" class="s-edge" marker-end="url(#a5)"/><path d="M442 238V310" class="s-edge" marker-end="url(#a5)"/>
+          <rect x="24" y="74" width="148" height="44" rx="8" class="s-box"/><text x="98" y="94" text-anchor="middle" class="t-mono">PLANNING</text><text x="98" y="110" text-anchor="middle" class="t-s">Intent</text>
+          <rect x="196" y="74" width="148" height="44" rx="8" class="s-box"/><text x="270" y="94" text-anchor="middle" class="t-mono">GATHER_CONTEXT</text><text x="270" y="110" text-anchor="middle" class="t-s">Context</text>
+          <rect x="368" y="74" width="148" height="44" rx="8" class="s-acc"/><text x="442" y="94" text-anchor="middle" class="t-mono t-b">REASONING</text><text x="442" y="110" text-anchor="middle" class="t-s">decide next move</text>
+          <rect x="540" y="74" width="148" height="44" rx="8" class="s-box"/><text x="614" y="94" text-anchor="middle" class="t-mono">ACTING</text><text x="614" y="110" text-anchor="middle" class="t-s">Action: tool call</text>
+          <rect x="540" y="194" width="148" height="44" rx="8" class="s-box"/><text x="614" y="214" text-anchor="middle" class="t-mono">OBSERVING</text><text x="614" y="230" text-anchor="middle" class="t-s">Observation</text>
+          <rect x="368" y="194" width="148" height="44" rx="8" class="s-box"/><text x="442" y="214" text-anchor="middle" class="t-mono">VERIFYING</text><text x="442" y="230" text-anchor="middle" class="t-s">Adjustment</text>
+          <path d="M560 194V160H480V118" class="s-loop" marker-end="url(#a5l)"/>
+          <path d="M404 194V118" class="s-loop" marker-end="url(#a5l)"/>
+          <text x="520" y="152" text-anchor="middle" font-size="11.5">test fails</text>
+          <text x="394" y="152" text-anchor="end" font-size="11.5">verify fails:</text>
+          <text x="394" y="168" text-anchor="end" font-size="11.5">reason fed back</text>
+          <text x="452" y="278" class="t-q">verifier passes</text>
+          <rect x="196" y="294" width="492" height="64" rx="8" class="s-tint"/>
+          <rect x="204" y="310" width="132" height="32" rx="16" class="s-box"/><text x="270" y="330" text-anchor="middle" class="t-mono">FAILED</text>
+          <rect x="376" y="310" width="132" height="32" rx="16" class="s-good"/><text x="442" y="330" text-anchor="middle" class="t-mono t-b">SUCCEEDED</text>
+          <rect x="548" y="310" width="132" height="32" rx="16" class="s-box"/><text x="614" y="330" text-anchor="middle" class="t-mono">BLOCKED</text>
+          <text x="24" y="322" class="t-b">Terminal states</text><text x="24" y="340" class="t-q">few and explicit</text>
+        </svg>
+      </figure>
+<pre><span class="k">class</span> LoopPhase(str, Enum):
+    PLANNING       = <span class="s">"planning"</span>        <span class="c"># Intent</span>
+    GATHER_CONTEXT = <span class="s">"gather_context"</span>  <span class="c"># Context</span>
+    REASONING      = <span class="s">"reasoning"</span>       <span class="c"># decide the next move</span>
+    ACTING         = <span class="s">"acting"</span>          <span class="c"># Action</span>
+    OBSERVING      = <span class="s">"observing"</span>       <span class="c"># Observation</span>
+    VERIFYING      = <span class="s">"verifying"</span>       <span class="c"># Adjustment</span>
+    SUCCEEDED, BLOCKED, FAILED          <span class="c"># terminal: few and explicit</span></pre>
+      <ul>
+        <li><b>Adjustment is a first-class phase</b>, not an afterthought. A chain has no OBSERVING or VERIFYING state.</li>
+        <li>"Plausible code" vs "the change actually works" is exactly the OBSERVING → REASONING edge on a failing test.</li>
+        <li><code>AgentLoop.run</code> calls <code>verify</code> before moving to SUCCEEDED; a failure goes back as a new user message.</li>
+      </ul>
+      <div class="callout"><span class="tag insight">Cycle test</span><p>Draw your system as a directed graph. If it has no cycle, it is a chain, however many LLM calls it contains. Loop engineering begins the moment an observation can send control backward.</p></div>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2><span class="n">08</span>Production lens: the same ideas in LangGraph <span class="badge">not from the book</span></h2>
+      <p>A bridge from the chapter to the framework in your study plan.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Book concept</th><th>LangGraph equivalent</th></tr></thead>
+        <tbody>
+          <tr><td>Chain (DAG, no back-edge)</td><td>Only plain <code>add_edge</code> calls, or an LCEL pipe <code>prompt | llm | parser</code></td></tr>
+          <tr><td>Loop (observation sends control back)</td><td><code>add_conditional_edges</code> whose router can return an earlier node</td></tr>
+          <tr><td><code>LoopPhase</code> + serialisable state</td><td><code>StateGraph</code> over a typed state; one node per phase</td></tr>
+          <tr><td>Recorded transitions, replay</td><td>A checkpointer (<code>SqliteSaver</code>, <code>PostgresSaver</code>) plus thread history</td></tr>
+          <tr><td>Verify before SUCCEEDED</td><td>A <code>verify</code> node whose router returns <code>END</code> only on pass</td></tr>
+          <tr><td>BLOCKED / budget</td><td>An attempt counter in state + <code>recursion_limit</code>; <code>interrupt()</code> to escalate to a human</td></tr>
+        </tbody>
+      </table></div>
+<pre><span class="k">def</span> route(state):               <span class="c"># the back-edge that makes it a loop</span>
+    <span class="k">if</span> state[<span class="s">"verified"</span>]:
+        <span class="k">return</span> END
+    <span class="k">if</span> state[<span class="s">"attempts"</span>] &gt;= 5:
+        <span class="k">return</span> <span class="s">"blocked"</span>
+    <span class="k">return</span> <span class="s">"reason"</span>              <span class="c"># failure reason already in state["messages"]</span>
+
+g.add_conditional_edges(<span class="s">"verify"</span>, route, [<span class="s">"reason"</span>, <span class="s">"blocked"</span>, END])</pre>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <div class="qa-head">
+        <h2 style="margin:0;font:700 21px/1.2 var(--f-display);display:flex;gap:10px;align-items:baseline"><span class="n" style="font:600 13px var(--f-mono);color:var(--accent)">09</span>Self-test: exercises 1.1–1.10</h2>
+        <button class="btn" id="toggle-all" type="button" aria-pressed="false">Reveal all answers</button>
+      </div>
+      <p>Answer aloud first, then open the card.</p>
+      <div class="qa">
+        <details><summary><span class="qn">1.1</span><span>Loop engineering vs prompt engineering?<span class="hint">What does each optimise?</span></span></summary>
+          <div class="ans"><ul><li>PE optimises one input → output exchange: a better first response.</li><li>LE optimises the process around the model: finding work, assembling context, verifying, feeding failures back, stopping.</li><li>PE fails with a weak answer; LE fails by stopping early, ignoring evidence or burning budget.</li></ul></div></details>
+        <details><summary><span class="qn">1.2</span><span>Chain vs loop, with a production example?<span class="hint">Can an early error be detected and reversed?</span></span></summary>
+          <div class="ans">OCR → summarise → email is a chain: bad OCR flows downstream. Add a verifier (character confidence, perplexity) and a back-edge that retries OCR with another engine or a deskew pass. Now step 1 can be reversed.</div></details>
+        <details><summary><span class="qn">1.3</span><span>The five stages, and which one carries the value?<span class="hint">Trick question.</span></span></summary>
+          <div class="ans">Intent, Context, Action, Observation, Adjustment. No single stage: the value is in <b>closing the loop</b>, so the next action is conditioned on the last signal.</div></details>
+        <details><summary><span class="qn">1.4</span><span>Why did loops mature in coding before customer support?<span class="hint">Which domain has a cheap verifier?</span></span></summary>
+          <div class="ans">Code self-verifies (compile, type-check, lint, test): dense, cheap, automatic, trustworthy. Support's signal is sparse, subjective and late. Loop feasibility = quality × latency of the verifier.</div></details>
+        <details><summary><span class="qn">1.5</span><span>"We have a multi-step LangChain pipeline, so we do loop engineering." Reply?<span class="hint">Look for a feedback edge.</span></span></summary>
+          <div class="ans">Ask whether any output can send control backward. Most pipelines are DAGs: sophisticated chains. Many steps is necessary, not sufficient; you need a back-edge gated by an observation.</div></details>
+        <details><summary><span class="qn">1.6</span><span>Intellectual lineage, and what is genuinely new?<span class="hint">Three sources, one new fact.</span></span></summary>
+          <div class="ans">OODA, ReAct, plan-act-verify. New: one LLM can be planner, actor and verifier inside one system, collapsing three subsystems (often three teams) into one loop.</div></details>
+        <details><summary><span class="qn">1.7</span><span>A loop gives confidently wrong output and never errors. Where do you look first?<span class="hint">What can contradict the model?</span></span></summary>
+          <div class="ans">Observation and Adjustment: a missing or ignored verifier. Classic bug: termination keys off "model gave a final answer" instead of "verifier passed". Make success depend on the verifier.</div></details>
+        <details><summary><span class="qn">1.8</span><span>When is a chain right and a loop wrong?<span class="hint">Cheapest structure that meets the bar.</span></span></summary>
+          <div class="ans">Well-understood, low-uncertainty tasks where each step succeeds given valid input: a known JSON into an email template, a fixed nightly report. A loop only adds calls, latency and non-determinism.</div></details>
+        <details><summary><span class="qn">1.9</span><span>How do you prove that moving chain → loop helped?<span class="hint">Not by feel.</span></span></summary>
+          <div class="ans"><ul><li>Fixed offline eval set.</li><li>Quality: success rate, pass@1. Cost: tokens, $, wall-clock. Reliability: variance, confidently-wrong rate, escalations.</li><li>Headline metric: <b>cost per successful task</b>. Also watch the iteration-count distribution: all 1s = overkill; many at the ceiling = weak verifier or action space.</li></ul></div></details>
+        <details><summary><span class="qn">1.10</span><span>Where does prompt engineering still matter?<span class="hint">Inside the loop.</span></span></summary>
+          <div class="ans">Everywhere inside the loop: fewer iterations, better-formed tool-call arguments, better self-reports (which become observations). Tune the architecture first, the prompt second.</div></details>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <h2><span class="n">10</span>Chapter summary</h2>
+      <ol class="recap">
+        <li>Loop engineering designs the system that prompts the agent; it is not the act of prompting.</li>
+        <li>A loop differs from a chain in one way: the outcome of an iteration changes what happens next.</li>
+        <li>Every loop has five stages: Intent, Context, Action, Observation, Adjustment.</li>
+        <li>Prompt engineering optimises one input; loop engineering optimises the system around repeated inputs and outputs.</li>
+        <li>Coding led because code self-verifies through tests, compilers and runtime behaviour.</li>
+      </ol>
+      <p><b>Next:</b> Chapter 2 builds this five-stage anatomy into a complete, concrete agent loop.</p>
+    </section>
+
+    <footer>Revision notes for <i>Loop Engineering: The Operating Model Behind Modern Agentic AI Systems</i>, Chapter 1.</footer>
+  </main>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('toggle-all');
+  var cards=document.querySelectorAll('#s9 details');
+  function sync(){var all=Array.prototype.every.call(cards,function(d){return d.open});btn.textContent=all?'Hide all answers':'Reveal all answers';btn.setAttribute('aria-pressed',String(all));}
+  btn.addEventListener('click',function(){var all=Array.prototype.every.call(cards,function(d){return d.open});cards.forEach(function(d){d.open=!all});sync();});
+  cards.forEach(function(d){d.addEventListener('toggle',sync)});
+})();
+</script>
+</body>
+</html>
