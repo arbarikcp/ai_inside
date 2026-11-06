@@ -10,6 +10,7 @@ members = [
     "ai-harness-labs",
     "llm-system-design",
     "loop-engineering",
+    "loop-engineering-study",
 ]
 
 [tool.uv.sources]

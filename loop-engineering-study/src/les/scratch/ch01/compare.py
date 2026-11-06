@@ -89,8 +89,8 @@ def build_runners(model: str) -> dict[str, RunnerFactory]:
         return FixerMock() if spec.family == "mock" else raw_client(model)
 
     return {
-        "chain": lambda: SingleShotChain(llm=llm(), spec=spec),
-        "loop": lambda: AnatomyLoop(llm=llm(), spec=spec),
+        #"chain": lambda: SingleShotChain(llm=llm(), spec=spec),
+        #"loop": lambda: AnatomyLoop(llm=llm(), spec=spec),
     }
 
 

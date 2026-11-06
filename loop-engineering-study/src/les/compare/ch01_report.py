@@ -36,7 +36,8 @@ def build_all_runners(model: str) -> dict[str, RunnerFactory]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Ch 1: every build on 10 tasks")
-    parser.add_argument("--model", default="mock", help="alias or role in models.yaml")
+    #parser.add_argument("--model", default="mock", help="alias or role in models.yaml")
+    parser.add_argument("--model", default="local", help="alias or role in models.yaml")
     parser.add_argument("--graph", action="store_true", help="print LG graph and exit")
     args = parser.parse_args(argv)
     if args.graph:
