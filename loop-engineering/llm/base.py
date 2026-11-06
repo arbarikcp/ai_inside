@@ -12,6 +12,15 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
 
 
+@dataclass
+class ToolCall:
+    """A structured request from the model to invoke a named tool."""
+
+    id: str
+    name: str
+    arguments: dict[str, Any] = field(default_factory=dict)
+
+
 @dataclass(frozen=True)
 class Message:
     """A single chat message. ``role`` is one of system|user|assistant|tool."""
@@ -21,15 +30,9 @@ class Message:
     # For tool result messages we keep the originating call id so the model can
     # correlate a result with the request that produced it.
     tool_call_id: str | None = None
-
-
-@dataclass
-class ToolCall:
-    """A structured request from the model to invoke a named tool."""
-
-    id: str
-    name: str
-    arguments: dict[str, Any] = field(default_factory=dict)
+    # For assistant messages that request tools we keep the calls, so the
+    # following tool result messages have a request to answer.
+    tool_calls: tuple[ToolCall, ...] = ()
 
 
 @dataclass

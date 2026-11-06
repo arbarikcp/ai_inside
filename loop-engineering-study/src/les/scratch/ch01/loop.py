@@ -71,7 +71,12 @@ class AnatomyLoop:
             final_code = ws.read(SOLUTION_FILE)
 
         self._state["messages"] = [
-            {"role": m.role, "content": m.content, "tool_call_id": m.tool_call_id}
+            {
+                "role": m.role,
+                "content": m.content,
+                "tool_call_id": m.tool_call_id,
+                "tool_calls": [tc.__dict__ for tc in m.tool_calls],
+            }
             for m in messages
         ]
         return self._result(stop, final, final_code, task)
@@ -110,6 +115,11 @@ class AnatomyLoop:
             self._state["completion_tokens"] += response.completion_tokens
 
             if response.wants_tool:
+                messages.append(
+                    Message(
+                        "assistant", response.text, tool_calls=tuple(response.tool_calls)
+                    )
+                )
                 for call in response.tool_calls:
                     self._stage("action")
                     out = self._execute(tools, call.name, call.arguments)

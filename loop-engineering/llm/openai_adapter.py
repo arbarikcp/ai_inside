@@ -55,4 +55,13 @@ class OpenAIAdapter(LLMClient):
         out: dict[str, Any] = {"role": m.role, "content": m.content}
         if m.tool_call_id:
             out["tool_call_id"] = m.tool_call_id
+        if m.tool_calls:
+            out["tool_calls"] = [
+                {
+                    "id": tc.id,
+                    "type": "function",
+                    "function": {"name": tc.name, "arguments": json.dumps(tc.arguments)},
+                }
+                for tc in m.tool_calls
+            ]
         return out

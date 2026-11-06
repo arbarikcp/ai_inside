@@ -11,7 +11,7 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 
-from ..llm.base import Message
+from ..llm.base import Message, ToolCall
 
 
 class LoopPhase(str, Enum):
@@ -68,8 +68,16 @@ class LoopState:
         )
         self.phase = phase
 
-    def add_message(self, role: str, content: str, tool_call_id: str | None = None) -> None:
-        self.messages.append(Message(role=role, content=content, tool_call_id=tool_call_id))
+    def add_message(
+        self,
+        role: str,
+        content: str,
+        tool_call_id: str | None = None,
+        tool_calls: tuple[ToolCall, ...] = (),
+    ) -> None:
+        self.messages.append(
+            Message(role=role, content=content, tool_call_id=tool_call_id, tool_calls=tool_calls)
+        )
 
     @property
     def elapsed_seconds(self) -> float:

@@ -111,6 +111,7 @@ class AgentLoop:
 
             # 3b) Action path -- run the requested tool calls.
             self._record_no_progress(state, made_progress=True)
+            state.add_message("assistant", response.text, tool_calls=tuple(response.tool_calls))
             for call in response.tool_calls:
                 veto = self.policy.veto_action(state, call.name, call.arguments)
                 if veto is not None:
