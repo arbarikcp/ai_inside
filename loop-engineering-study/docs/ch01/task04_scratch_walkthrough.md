@@ -757,4 +757,4 @@ Run everything: `uv run pytest -q` (108 passed; the 10 skips are 5 `ch01_lg` slo
 - **Real-model runs.** The lab's `OpenAIAdapter` doesn't put the assistant's `tool_calls` back into the message history. OpenAI's API rejects `role=tool` messages that don't follow a tool call, so `--model gpt` will likely fail. Ollama may tolerate it. The fix needs a study-side adapter in `les/models` (pending your decision).
 - **The mock is "teachable" by construction.** Its loop success is scripted; the experiment shows the *mechanism*, not a real model's skill. The real comparison comes from rerunning `compare --model local`.
 - **No Ch 3 budgets yet.** Only an iteration cap. Token, time and cost budgets plus resume arrive in Tasks 8–9, which build on `get_state()`.
-- **Task 5** builds the same loop with LangGraph `create_agent`, registers it as `ch01_lg`, and must pass the same contract tests.
+- **Task 5** ✅ done: the same loop on LangGraph `create_agent` (`ch01_lg`) and the OpenAI Agents SDK (`ch01_oai_sdk`), both passing the same contract tests. See [task05_langgraph_walkthrough.md](task05_langgraph_walkthrough.md).

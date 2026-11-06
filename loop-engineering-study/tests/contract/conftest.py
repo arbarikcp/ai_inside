@@ -25,6 +25,14 @@ from les.scratch.ch01 import AnatomyLoop, SingleShotChain  # noqa: E402
 register_runner("ch01_scratch_chain", SingleShotChain)
 register_runner("ch01_scratch_loop", AnatomyLoop)
 
+from les.lg.ch01 import LGAgentLoop  # noqa: E402
+
+register_runner("ch01_lg", LGAgentLoop)
+
+from les.compare.openai_agents.ch01 import SDKAgentLoop  # noqa: E402
+
+register_runner("ch01_oai_sdk", SDKAgentLoop)
+
 
 # The fixture is a placeholder until chapter implementations register.
 # Usage in contract tests:

@@ -1,4 +1,4 @@
-"""Ch 1 contract tests — every Ch 1 runner (scratch now, LangGraph in Task 5)."""
+"""Ch 1 contract tests: every Ch 1 build (scratch, LangGraph, Agents SDK)."""
 
 from __future__ import annotations
 
@@ -9,7 +9,12 @@ import pytest
 from les.contracts import LoopResult, LoopRunner, StopReason
 from les.scratch.ch01.tasks import TASKS_BY_ID
 
-CH01_RUNNERS = ["ch01_scratch_chain", "ch01_scratch_loop", "ch01_lg"]
+CH01_RUNNERS = [
+    "ch01_scratch_chain",
+    "ch01_scratch_loop",
+    "ch01_lg",
+    "ch01_oai_sdk",
+]
 
 
 @pytest.mark.parametrize("runner_name", CH01_RUNNERS)
